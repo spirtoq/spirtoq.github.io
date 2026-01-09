@@ -3,471 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spirtoq Linktree</title>
+    <title>Spirtoq // STATIC_WIDE_CORE</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
+
+    <script data-goatcounter="https://spirtoq.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
 
     <style>
         :root {
-            --bg-color: #000000;
-            --card-bg: #1e1f22;
-            --card-surface: #2b2d31;
-            --primary-color: #5865F2;
-            --text-main: #f2f3f5;
-            --text-sub: #b5bac1;
-            --snake-color: #00ffaa;
+            --accent: #00f3ff;
+            --bg: #050505;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg);
+            color: #fff;
             min-height: 100vh;
             display: flex;
-            flex-direction: column; 
             align-items: center;
-            padding: 60px 20px;
-            gap: 20px; 
-            overflow-x: hidden;
+            justify-content: center;
+            overflow: hidden;
         }
 
-        #particles-js {
+        #canvas-3d {
             position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-        }
-
-        .secret-gif-container {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: center;
-            margin-bottom: -15px; 
-            opacity: 0;
-            transform: translateY(30px) scale(0.8);
-            transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        .secret-gif-container.show {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-
-        .secret-gif {
-            width: 250px;
-            height: auto;
-            border-radius: 15px;
-            filter: drop-shadow(0 0 15px rgba(0, 255, 170, 0.4));
-        }
-
-        .card-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 400px;
-            border-radius: 24px;
-            padding: 3px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            overflow: hidden; 
-            flex-shrink: 0;
-        }
-
-        .card-wrapper::before, .card-wrapper::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(transparent, transparent, transparent, var(--snake-color));
-            animation: rotate 4s linear infinite;
-            z-index: 0;
-        }
-        .card-wrapper::after {
-            animation-delay: -2s;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .card-content {
-            position: relative;
-            background: var(--card-bg);
-            border-radius: 22px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-
-        .card-glare {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(105deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0) 30%);
             pointer-events: none;
+            filter: drop-shadow(0 0 15px rgba(0, 243, 255, 0.4));
+        }
+
+        .main-wrapper {
+            position: relative;
             z-index: 10;
-            animation: glare-anim 6s infinite ease-in-out;
-        }
-
-        @keyframes glare-anim {
-            0% { transform: translateX(-100%); }
-            20% { transform: translateX(100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .banner {
             width: 100%;
-            height: 140px;
-            background-image: url('https://files.catbox.moe/laj0nj.gif');
-            background-size: cover;
-            background-position: center;
-        }
-
-        .profile-section {
-            padding: 0 20px;
-            margin-top: -50px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 6px solid var(--card-bg);
-            background-image: url('https://files.catbox.moe/3n70u9.jpg');
-            background-size: cover;
-            background-position: center;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-            position: relative;
-        }
-
-        .status-indicator {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 22px;
-            height: 22px;
-            background-color: #23a559;
-            border: 4px solid var(--card-bg);
-            border-radius: 50%;
-        }
-
-        .username-block { text-align: center; margin-top: 10px; }
-        .username-block h1 { 
-            font-size: 24px; 
-            font-weight: 700; 
-            color: var(--text-main); 
-            cursor: pointer; 
-            user-select: none;
-            transition: color 0.3s, transform 0.2s;
-        }
-        .username-block h1:hover { color: var(--snake-color); }
-        .username-block h1:active { transform: scale(0.95); }
-
-        .username-block span { font-size: 14px; color: var(--text-sub); }
-
-        .links-container {
-            padding: 0 20px 20px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .link-btn {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            background-color: var(--card-surface);
-            border-radius: 12px;
-            text-decoration: none;
-            color: var(--text-main);
-            transition: all 0.3s;
-            border: 1px solid transparent;
-        }
-        .link-btn:hover {
-            background-color: #35373c;
-            transform: translateY(-2px);
-            border-color: rgba(255,255,255,0.1);
-        }
-        .link-icon { width: 32px; height: 32px; border-radius: 8px; margin-right: 15px; object-fit: contain; }
-        .link-text { font-weight: 600; font-size: 16px; }
-
-        .mini-player-hint {
-            margin: 0 20px 20px 20px;
-            text-align: center;
-            font-size: 12px;
-            color: var(--text-sub);
-            opacity: 0.7;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-        .arrow-down { animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-5px);} 60% {transform: translateY(-3px);} }
-
-        .player-content {
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-            padding: 30px;
+            max-width: 650px; 
+            padding: 20px;
             text-align: center;
         }
 
-        .player-bg {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-size: cover;
-            background-position: center;
-            filter: blur(25px) brightness(0.4);
-            z-index: 0;
-            transition: background-image 0.5s ease;
+        h1 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(3rem, 10vw, 5rem);
+            letter-spacing: -2px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 30px rgba(0,0,0,1);
         }
 
-        .player-ui {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .big-cover {
-            width: 200px;
-            height: 200px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            margin-bottom: 25px;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .song-title {
-            font-size: 22px;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 8px;
-            line-height: 1.2;
-        }
-
-        .source-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 24px;
-            background-color: #ffff64; 
-            color: #000;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 800;
+        .vibing-text {
             font-size: 14px;
+            letter-spacing: 4px;
+            color: var(--accent);
             text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(255, 255, 100, 0.3);
+            margin-bottom: 30px;
+            font-weight: 500;
         }
 
-        .player-status {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(0,0,0,0.5);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: bold;
+        .music-center {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 0;
+            display: flex;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 40px auto;
+            align-items: center;
+            gap: 15px;
+            transition: 0.3s;
+        }
+
+        .disc-art {
+            width: 60px;
+            height: 60px;
+            border-radius: 0;
+            border: 1px solid var(--accent);
+            object-fit: cover;
+        }
+
+        .track-meta { text-align: left; flex-grow: 1; }
+        .track-title { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
+        .track-artist { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .link-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 25px;
+            text-decoration: none;
             color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.4s ease;
             backdrop-filter: blur(5px);
-            z-index: 2;
+        }
+
+        .link-card:hover {
+            background: rgba(0, 243, 255, 0.08);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .link-icon { width: 32px; height: 32px; object-fit: contain; }
+        .link-label { font-family: 'Syncopate', sans-serif; font-size: 9px; letter-spacing: 2px; }
+
+        /* СТИЛИ СЧЕТЧИКА ПОСЕТИТЕЛЕЙ */
+        .visitor-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            background: var(--glass);
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(5px);
         }
-        .live-dot {
-            width: 8px; height: 8px; border-radius: 50%; background: #00ffaa;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% {opacity: 1;} 50% {opacity: 0.4;} 100% {opacity: 1;} }
 
+        .eye-icon {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent);
+        }
+
+        @media (max-width: 480px) {
+            .button-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="particles-js"></div>
+    <canvas id="canvas-3d"></canvas>
 
-    <div class="secret-gif-container" id="gif-container">
-        <img src="https://mynickname.com/forum/Spirtoq.gif" alt="Surprise" class="secret-gif">
-    </div>
+    <div class="main-wrapper">
+        <h1 id="avatar-trigger" style="cursor:pointer">SPIRTOQ</h1>
+        <div class="vibing-text">Just vibing...</div>
 
-    <div class="card-wrapper">
-        <div class="card-content">
-            <div class="card-glare"></div>
-            <div class="banner"></div>
-            
-            <div class="profile-section">
-                <div class="avatar">
-                    <div class="status-indicator"></div>
-                </div>
-                <div class="username-block">
-                    <h1 id="clickable-name">Spirtoq</h1>
-                    <span>Just vibing...</span>
-                </div>
+        <div class="music-center" id="player" style="opacity: 0;">
+            <img src="" id="track-art" class="disc-art">
+            <div class="track-meta">
+                <div id="track-name" class="track-title">SCANNING...</div>
+                <div id="track-artist" class="track-artist">PLEASE WAIT</div>
             </div>
+            <div style="font-size: 10px; color: var(--accent); opacity: 0.5;">LIVE</div>
+        </div>
 
-            <div class="links-container">
-                <a href="https://t.me/ExteraSpirtoq" target="_blank" class="link-btn">
-                    <img src="https://files.catbox.moe/hfe7zv.png" alt="Telegram" class="link-icon">
-                    <span class="link-text">Telegram</span>
-                </a>
-                <a href="https://Last.fm/user/Spirtoq" target="_blank" class="link-btn">
-                    <img src="https://files.catbox.moe/b5tv94.png" alt="LastFM" class="link-icon">
-                    <span class="link-text">LastFM</span>
-                </a>
-                <a href="https://discord.gg/EkyNTSzQ" target="_blank" class="link-btn">
-                    <img src="https://files.catbox.moe/s4qrcp.png" alt="Discord" class="link-icon">
-                    <span class="link-text">Discord</span>
-                </a>
-                <a href="https://shikimori.one/SpirtoQ" target="_blank" class="link-btn">
-                    <img src="https://files.catbox.moe/inwllg.png" alt="Shikimori" class="link-icon">
-                    <span class="link-text">Shikimori</span>
-                </a>
-            </div>
-
-            <div class="mini-player-hint">
-                <span>Scroll down for music card</span>
-                <span class="arrow-down">▼</span>
-            </div>
+        <div class="button-grid">
+            <a href="https://t.me/ExteraSpirtoq" target="_blank" class="link-card">
+                <img src="https://files.catbox.moe/hfe7zv.png" class="link-icon">
+                <span class="link-label">TELEGRAM</span>
+            </a>
+            <a href="https://Last.fm/user/Spirtoq" target="_blank" class="link-card">
+                <img src="https://files.catbox.moe/b5tv94.png" class="link-icon">
+                <span class="link-label">LAST.FM</span>
+            </a>
+            <a href="https://discord.gg/EkyNTSzQ" target="_blank" class="link-card">
+                <img src="https://files.catbox.moe/s4qrcp.png" class="link-icon">
+                <span class="link-label">DISCORD</span>
+            </a>
+            <a href="https://shikimori.one/SpirtoQ" target="_blank" class="link-card">
+                <img src="https://files.catbox.moe/inwllg.png" class="link-icon">
+                <span class="link-label">SHIKIMORI</span>
+            </a>
         </div>
     </div>
 
-    <div class="card-wrapper" id="big-player-wrapper" style="opacity: 0; transition: opacity 1s; margin-top: 20px;">
-        <div class="card-content player-content">
-            <div class="card-glare"></div>
-            <div class="player-bg" id="player-bg"></div>
-            <div class="player-status">
-                <div class="live-dot" id="player-dot"></div>
-                <span id="player-status-text">OFFLINE</span>
-            </div>
-            <div class="player-ui">
-                <img src="" alt="Cover" class="big-cover" id="big-cover">
-                <div class="song-info">
-                    <div class="song-title" id="big-title">Loading...</div>
-                    <div class="song-artist" id="big-artist">...</div>
-                </div>
-                <a href="#" target="_blank" class="source-btn" id="genius-link">Open on Genius</a>
-            </div>
-        </div>
+    <div class="visitor-counter">
+        <svg class="eye-icon" viewBox="0 0 24 24">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+        </svg>
+        <span id="stats-visits">0</span>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <img src="https://mynickname.com/forum/Spirtoq.gif" id="secret-gif" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); z-index:100; transition:0.4s; border:1px solid var(--accent);">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        /* Обновленные настройки частиц: Ярче и толще */
-        particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 70, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": "#ffffff" },
-                "shape": { "type": "circle" },
-                "opacity": { 
-                    "value": 0.6, /* Увеличена общая яркость */
-                    "random": true, 
-                    "anim": { "enable": true, "speed": 1, "opacity_min": 0.2, "sync": false } 
-                },
-                "size": { 
-                    "value": 4, /* Сами точки стали чуть крупнее */
-                    "random": true 
-                },
-                "line_linked": { 
-                    "enable": true, 
-                    "distance": 150, 
-                    "color": "#ffffff", 
-                    "opacity": 0.4, /* Линии теперь намного заметнее */
-                    "width": 1.5    /* Линии стали толще */
-                },
-                "move": { "enable": true, "speed": 2 }
-            },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": { "onhover": { "enable": true, "mode": "grab" } },
-                "modes": { "grab": { "distance": 160, "line_linked": { "opacity": 0.8 } } }
-            },
-            "retina_detect": true
+        // Код для получения данных счетчика
+        window.addEventListener('load', function() {
+            var r = new XMLHttpRequest();
+            r.addEventListener('load', function() {
+                try {
+                    var data = JSON.parse(this.responseText);
+                    document.getElementById('stats-visits').innerText = data.count || '0';
+                } catch(e) { console.error("Error loading stats"); }
+            });
+            // Запрашиваем общее количество просмотров страницы
+            r.open('GET', 'https://spirtoq.goatcounter.com/counter/TOTAL.json');
+            r.send();
         });
 
-        const clickableName = document.getElementById('clickable-name');
-        const gifContainer = document.getElementById('gif-container');
+        // --- Остальной ваш JS код (Three.js и Last.fm) ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-3d'), alpha: true, antialias: true });
+        const size = Math.min(window.innerWidth, window.innerHeight) * 0.95;
+        renderer.setSize(size, size);
 
-        clickableName.addEventListener('click', () => {
-            gifContainer.classList.toggle('show');
+        const geometries = [
+            new THREE.IcosahedronGeometry(1.8, 0),
+            new THREE.TorusGeometry(1.2, 0.5, 12, 18),
+            new THREE.OctahedronGeometry(1.8, 0),
+            new THREE.DodecahedronGeometry(1.7, 0),
+            new THREE.BoxGeometry(1.6, 1.6, 1.6),
+            new THREE.ConeGeometry(1.5, 2.5, 6),
+            new THREE.CylinderGeometry(1, 1, 2.2, 8),
+            new THREE.TorusKnotGeometry(1, 0.3, 40, 8)
+        ];
+
+        const material = new THREE.MeshPhysicalMaterial({
+            color: 0x00f3ff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.6,
+            emissive: 0x00f3ff,
+            emissiveIntensity: 1.2
         });
 
-        const apiKey = '460cda35be2fbf4f28e8ea7a38580730';
-        const user = 'Spirtoq';
-        const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${user}&api_key=${apiKey}&format=json&limit=1`;
+        const mesh = new THREE.Mesh(geometries[0], material);
+        scene.add(mesh);
+        const light1 = new THREE.PointLight(0xffffff, 2);
+        light1.position.set(5, 5, 5);
+        scene.add(light1);
+        camera.position.z = 4.5;
 
-        const playerWrapper = document.getElementById('big-player-wrapper');
-        const bgLayer = document.getElementById('player-bg');
-        const bigCover = document.getElementById('big-cover');
-        const bigTitle = document.getElementById('big-title');
-        const bigArtist = document.getElementById('big-artist');
-        const geniusLink = document.getElementById('genius-link');
-        const statusText = document.getElementById('player-status-text');
-        const statusDot = document.getElementById('player-dot');
+        let shapeIdx = 0;
+        setInterval(() => {
+            shapeIdx = (shapeIdx + 1) % geometries.length;
+            mesh.geometry.dispose();
+            mesh.geometry = geometries[shapeIdx];
+        }, 3000);
 
-        async function fetchLastFM() {
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data.recenttracks && data.recenttracks.track.length > 0) {
-                    const track = data.recenttracks.track[0];
-                    const isPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
-                    let imgUrl = 'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png';
-                    if (track.image && track.image.length > 0) {
-                        const bestImg = track.image.find(i => i.size === 'extralarge') || track.image[track.image.length - 1];
-                        if (bestImg['#text']) imgUrl = bestImg['#text'];
-                    }
-                    playerWrapper.style.opacity = '1';
-                    bgLayer.style.backgroundImage = `url('${imgUrl}')`;
-                    bigCover.src = imgUrl;
-                    bigTitle.innerText = track.name;
-                    bigArtist.innerText = track.artist['#text'];
-                    if (isPlaying) {
-                        statusText.innerText = "NOW PLAYING";
-                        statusDot.style.background = "#00ffaa";
-                    } else {
-                        statusText.innerText = "LAST PLAYED";
-                        statusDot.style.background = "#ccc";
-                    }
-                    const query = encodeURIComponent(`${track.artist['#text']} ${track.name}`);
-                    geniusLink.href = `https://genius.com/search?q=${query}`;
-                }
-            } catch (error) { console.error('LastFM Error:', error); }
+        function animate() {
+            requestAnimationFrame(animate);
+            mesh.rotation.x += 0.006;
+            mesh.rotation.y += 0.007;
+            const time = Date.now() * 0.002;
+            material.emissiveIntensity = 1 + Math.sin(time) * 0.5;
+            renderer.render(scene, camera);
         }
-        fetchLastFM();
-        setInterval(fetchLastFM, 15000);
+        animate();
+
+        async function updateMusic() {
+            try {
+                const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=Spirtoq&api_key=460cda35be2fbf4f28e8ea7a38580730&format=json&limit=1`);
+                const d = await r.json();
+                const track = d.recenttracks.track[0];
+                document.getElementById('player').style.opacity = '1';
+                document.getElementById('track-art').src = track.image[1]['#text'];
+                document.getElementById('track-name').innerText = track.name;
+                document.getElementById('track-artist').innerText = track.artist['#text'];
+            } catch(e) {}
+        }
+        updateMusic();
+        setInterval(updateMusic, 20000);
+
+        const trigger = document.getElementById('avatar-trigger');
+        const gif = document.getElementById('secret-gif');
+        trigger.onclick = () => gif.style.transform = 'translate(-50%,-50%) scale(1)';
+        gif.onclick = () => gif.style.transform = 'translate(-50%,-50%) scale(0)';
+
+        window.onresize = () => {
+            const newSize = Math.min(window.innerWidth, window.innerHeight) * 0.95;
+            renderer.setSize(newSize, newSize);
+        };
     </script>
 </body>
-                </html>
-        
+    </html>
+    
