@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PS8L7RGL');</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spirtoq // STATIC_WIDE_CORE</title>
@@ -123,7 +128,6 @@
         .link-icon { width: 32px; height: 32px; object-fit: contain; }
         .link-label { font-family: 'Syncopate', sans-serif; font-size: 9px; letter-spacing: 2px; }
 
-        /* СТИЛИ СЧЕТЧИКА ПОСЕТИТЕЛЕЙ */
         .visitor-counter {
             position: fixed;
             bottom: 20px;
@@ -153,7 +157,8 @@
     </style>
 </head>
 <body>
-
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PS8L7RGL"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <canvas id="canvas-3d"></canvas>
 
     <div class="main-wrapper">
@@ -200,7 +205,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        // Код для получения данных счетчика
         window.addEventListener('load', function() {
             var r = new XMLHttpRequest();
             r.addEventListener('load', function() {
@@ -209,12 +213,10 @@
                     document.getElementById('stats-visits').innerText = data.count || '0';
                 } catch(e) { console.error("Error loading stats"); }
             });
-            // Запрашиваем общее количество просмотров страницы
             r.open('GET', 'https://spirtoq.goatcounter.com/counter/TOTAL.json');
             r.send();
         });
 
-        // --- Остальной ваш JS код (Three.js и Last.fm) ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-3d'), alpha: true, antialias: true });
@@ -290,5 +292,5 @@
         };
     </script>
 </body>
-    </html>
-    
+                </html>
+                
