@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPIRTOQ // EXTERAGRAM</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg: #050505;
+            --card-bg: #0a0a0a;
+            --accent: #ff003c; 
+            --text: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ТЕКСТОВЫЙ БЛОК НА ФОНЕ */
+        .bg-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            width: 180%;
+            display: flex;
+            flex-direction: column;
+            opacity: 0.12;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .marquee-text {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 10vw;
+            line-height: 0.85; 
+            white-space: nowrap;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--text);
+            text-transform: uppercase;
+        }
+
+        /* КОНТЕНТ */
+        .content-layer {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 440px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #222;
+            padding: 20px;
+            text-decoration: none;
+            color: white;
+            transition: 0.2s ease;
+        }
+
+        .card:hover { border-color: var(--accent); background: #111; }
+
+        .profile-header {
+            grid-column: span 2;
+            text-align: center;
+            border-top: 5px solid var(--accent);
+            padding: 40px 20px;
+        }
+
+        .avatar {
+            width: 110px; height: 110px;
+            border: 2px solid white;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .nickname {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: -1px;
+        }
+
+        /* LAST FM WIDGET FIXED */
+        .music-widget {
+            grid-column: span 2;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #000;
+            min-height: 100px;
+        }
+
+        .track-art-container {
+            width: 65px;
+            height: 65px;
+            flex-shrink: 0;
+            background: linear-gradient(45deg, #111, #222);
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .track-art { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .track-info { flex: 1; min-width: 0; }
+
+        .status-tag {
+            font-size: 9px;
+            background: var(--accent);
+            padding: 2px 6px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        #track-name { font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #track-artist { font-size: 11px; opacity: 0.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* SOCIAL ICONS FIXED */
+        .social-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #0f0f0f;
+            padding: 15px 10px;
+            font-weight: bold;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .social-btn img {
+            width: 32px; /* Фиксированный размер */
+            height: 32px;
+            object-fit: contain; /* Пропорции не ломаются */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-overlay">
+        <div class="marquee-text" id="r1">EXTERAGRAM EXTERAGRAM</div>
+        <div class="marquee-text" id="r2">EXTERAGRAM EXTERAGRAM</div>
+        <div class="marquee-text" id="r3">EXTERAGRAM EXTERAGRAM</div>
+        <div class="marquee-text" id="r4">EXTERAGRAM EXTERAGRAM</div>
+    </div>
+
+    <div class="content-layer">
+        <div class="main-container">
+            
+            <header class="card profile-header">
+                <img src="https://files.catbox.moe/3n70u9.jpg" class="avatar">
+                <h1 class="nickname">SPIRTOQ</h1>
+            </header>
+
+            <div class="card music-widget">
+                <div class="track-art-container">
+                    <img src="" id="track-art" class="track-art" style="display:none;">
+                </div>
+                <div class="track-info">
+                    <span class="status-tag" id="lfm-status">SYNCING...</span>
+                    <div id="track-name">Loading...</div>
+                    <div id="track-artist">Connecting to API</div>
+                </div>
+            </div>
+
+            <a href="https://t.me/spirtoq" class="card social-btn">
+                <img src="https://files.catbox.moe/hfe7zv.png"> Telegram
+            </a>
+            <a href="https://last.fm/user/Spirtoq" class="card social-btn">
+                <img src="https://files.catbox.moe/b5tv94.png"> Last.fm
+            </a>
+            <a href="#" class="card social-btn">
+                <img src="https://files.catbox.moe/s4qrcp.png"> Discord
+            </a>
+            <a href="#" class="card social-btn">
+                <img src="https://files.catbox.moe/inwllg.png"> Shikimori
+            </a>
+
+        </div>
+    </div>
+
+    <script>
+        gsap.to("#r1, #r3", { xPercent: -10, duration: 6, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        gsap.to("#r2, #r4", { xPercent: 10, duration: 6, repeat: -1, yoyo: true, ease: "sine.inOut" });
+
+        const API_KEY = '460cda35be2fbf4f28e8ea7a38580730';
+        const USER = 'Spirtoq';
+
+        async function updateLFM() {
+            try {
+                const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USER}&api_key=${API_KEY}&format=json&limit=1`);
+                const d = await r.json();
+                const t = d.recenttracks.track[0];
+                
+                document.getElementById('track-name').innerText = t.name;
+                document.getElementById('track-artist').innerText = t.artist['#text'];
+                
+                const art = t.image[2]['#text'];
+                const artEl = document.getElementById('track-art');
+                if(art && art !== "") {
+                    artEl.src = art;
+                    artEl.style.display = 'block';
+                } else {
+                    artEl.style.display = 'none';
+                }
+                
+                const status = document.getElementById('lfm-status');
+                if (t['@attr'] && t['@attr'].nowplaying) {
+                    status.innerText = '• NOW PLAYING';
+                    status.style.background = '#00ff00';
+                    status.style.color = '#000';
+                } else {
+                    status.innerText = 'LAST TRACK';
+                    status.style.background = '#ff003c';
+                    status.style.color = '#fff';
+                }
+            } catch (e) {
+                document.getElementById('track-name').innerText = "Offline";
+            }
+        }
+
+        updateLFM();
+        setInterval(updateLFM, 15000);
+    </script>
+</body>
+</html>
