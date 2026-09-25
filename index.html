@@ -1,305 +1,340 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="cyan" data-sfx="off" data-cursor="on">
 <head>
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-PS8L7RGL');</script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXYRCHM33K"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SPIRTOQ // NULL SECTOR</title>
 
-      gtag('config', 'G-XXYRCHM33K');
-    </script>
+<meta name="description" content="Personal transmission node of Spirtoq. Deep web frequency, live telemetry, ambient now-playing and an interactive terminal.">
+<meta name="author" content="Spirtoq">
+<meta name="theme-color" content="#04060a">
+<meta name="color-scheme" content="dark">
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spirtoq // STATIC_WIDE_CORE</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SPIRTOQ // NULL SECTOR">
+<meta property="og:description" content="Deep web frequency. Just vibing.">
+<meta property="og:url" content="https://spirtoq.github.io/">
+<meta property="og:site_name" content="SPIRTOQ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SPIRTOQ // NULL SECTOR">
+<meta name="twitter:description" content="Deep web frequency. Just vibing.">
 
-    <script data-goatcounter="https://spirtoq.goatcounter.com/count"
-            async src="//gc.zgo.at/count.js"></script>
+<!-- Google Tag Manager + GA4 -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PS8L7RGL');</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXYRCHM33K"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXYRCHM33K');
+</script>
 
-    <style>
-        :root {
-            --accent: #00f3ff;
-            --bg: #050505;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.1);
-        }
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="favicon.svg">
+<link rel="manifest" href="site.webmanifest">
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@200;300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background-color: var(--bg);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        #canvas-3d {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            pointer-events: none;
-            filter: drop-shadow(0 0 15px rgba(0, 243, 255, 0.4));
-        }
-
-        .main-wrapper {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 650px; 
-            padding: 20px;
-            text-align: center;
-        }
-
-        h1 {
-            font-family: 'Syncopate', sans-serif;
-            font-size: clamp(3rem, 10vw, 5rem);
-            letter-spacing: -2px;
-            margin-bottom: 5px;
-            text-shadow: 0 0 30px rgba(0,0,0,1);
-        }
-
-        .vibing-text {
-            font-size: 14px;
-            letter-spacing: 4px;
-            color: var(--accent);
-            text-transform: uppercase;
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-
-        .music-center {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            padding: 15px;
-            border-radius: 0;
-            display: flex;
-            width: 100%;
-            max-width: 450px;
-            margin: 0 auto 40px auto;
-            align-items: center;
-            gap: 15px;
-            transition: 0.3s;
-        }
-
-        .disc-art {
-            width: 60px;
-            height: 60px;
-            border-radius: 0;
-            border: 1px solid var(--accent);
-            object-fit: cover;
-        }
-
-        .track-meta { text-align: left; flex-grow: 1; }
-        .track-title { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
-        .track-artist { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
-
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .link-card {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            padding: 25px;
-            text-decoration: none;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.4s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .link-card:hover {
-            background: rgba(0, 243, 255, 0.08);
-            border-color: var(--accent);
-            transform: translateY(-3px);
-        }
-
-        .link-icon { width: 32px; height: 32px; object-fit: contain; }
-        .link-label { font-family: 'Syncopate', sans-serif; font-size: 9px; letter-spacing: 2px; }
-
-        .visitor-counter {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            background: var(--glass);
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            backdrop-filter: blur(5px);
-        }
-
-        .eye-icon {
-            width: 16px;
-            height: 16px;
-            fill: var(--accent);
-        }
-
-        @media (max-width: 480px) {
-            .button-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+<link rel="stylesheet" href="css/main.css">
 </head>
+
 <body>
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PS8L7RGL"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <canvas id="canvas-3d"></canvas>
 
-    <div class="main-wrapper">
-        <h1 id="avatar-trigger" style="cursor:pointer">SPIRTOQ</h1>
-        <div class="vibing-text">Just vibing...</div>
+<noscript>
+  <div style="position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
+              background:#04060a;color:#d9e7f2;font:400 13px/1.8 'JetBrains Mono',monospace;
+              text-align:center;padding:32px">
+    <div>
+      <div style="font-size:11px;letter-spacing:.3em;color:#5d7186;margin-bottom:18px">
+        SPIRTOQ // NULL SECTOR
+      </div>
+      <div style="color:#00f3ff;margin-bottom:16px">JavaScript отключён.</div>
+      <div style="color:#8fa6b8">
+        Фон, музыка и терминал без него не запустятся.<br>
+        Каналы связи:<br>
+        <a style="color:#00f3ff" href="https://t.me/ExteraSpirtoq">telegram</a> ·
+        <a style="color:#00f3ff" href="https://Last.fm/user/Spirtoq">last.fm</a> ·
+        <a style="color:#00f3ff" href="https://discord.gg/EkyNTSzQ">discord</a> ·
+        <a style="color:#00f3ff" href="https://shikimori.one/SpirtoQ">shikimori</a>
+      </div>
+    </div>
+  </div>
+</noscript>
 
-        <div class="music-center" id="player" style="opacity: 0;">
-            <img src="" id="track-art" class="disc-art">
-            <div class="track-meta">
-                <div id="track-name" class="track-title">SCANNING...</div>
-                <div id="track-artist" class="track-artist">PLEASE WAIT</div>
-            </div>
-            <div style="font-size: 10px; color: var(--accent); opacity: 0.5;">LIVE</div>
-        </div>
+<!-- ═══════════════ LAYER 0 · WebGL field ═══════════════ -->
+<canvas id="gl" aria-hidden="true"></canvas>
+<canvas id="rain" class="rain" aria-hidden="true" hidden></canvas>
 
-        <div class="button-grid">
-            <a href="https://t.me/ExteraSpirtoq" target="_blank" class="link-card">
-                <img src="https://files.catbox.moe/hfe7zv.png" class="link-icon">
-                <span class="link-label">TELEGRAM</span>
-            </a>
-            <a href="https://Last.fm/user/Spirtoq" target="_blank" class="link-card">
-                <img src="https://files.catbox.moe/b5tv94.png" class="link-icon">
-                <span class="link-label">LAST.FM</span>
-            </a>
-            <a href="https://discord.gg/EkyNTSzQ" target="_blank" class="link-card">
-                <img src="https://files.catbox.moe/s4qrcp.png" class="link-icon">
-                <span class="link-label">DISCORD</span>
-            </a>
-            <a href="https://shikimori.one/SpirtoQ" target="_blank" class="link-card">
-                <img src="https://files.catbox.moe/inwllg.png" class="link-icon">
-                <span class="link-label">SHIKIMORI</span>
-            </a>
-        </div>
+<!-- ═══════════════ LAYER 1 · CRT grade ═══════════════ -->
+<div class="fx fx--scan"   aria-hidden="true"></div>
+<div class="fx fx--aberr"  aria-hidden="true"></div>
+<div class="fx fx--vign"   aria-hidden="true"></div>
+<div class="fx fx--grain"  aria-hidden="true"></div>
+
+<!-- ═══════════════ LAYER 2 · cursor ═══════════════ -->
+<div class="cur" aria-hidden="true">
+  <span class="cur__dot"></span>
+  <span class="cur__ring"></span>
+  <span class="cur__label"></span>
+</div>
+
+<!-- ═══════════════ LAYER 3 · boot ═══════════════ -->
+<div class="boot" id="boot" role="status" aria-live="polite">
+  <div class="boot__inner">
+    <pre class="boot__log" id="bootLog"></pre>
+    <div class="boot__meter"><i id="bootBar"></i></div>
+    <p class="boot__pct"><span id="bootPct">0</span>%</p>
+  </div>
+  <div class="boot__skip">press <kbd>ESC</kbd> to skip</div>
+</div>
+
+<!-- ═══════════════ LAYER 4 · chrome ═══════════════ -->
+<div class="scrollbar" aria-hidden="true"><i id="scrollFill"></i></div>
+
+<header class="topbar" id="topbar">
+  <a class="brand" href="#hero" data-mag>
+    <span class="brand__mark">◈</span>
+    <span class="brand__txt">SPIRTOQ<i>//</i>NS</span>
+  </a>
+  <nav class="topnav" aria-label="Разделы">
+    <a href="#signal" data-mag><i>01</i>signal</a>
+    <a href="#uplink"  data-mag><i>02</i>uplink</a>
+    <a href="#shell"   data-mag><i>03</i>shell</a>
+  </nav>
+  <div class="topbar__meta">
+    <button class="pill" id="sfxBtn" type="button" data-mag aria-pressed="false">
+      <span class="pill__dot"></span><span class="pill__lbl">SFX</span><span id="sfxState">OFF</span>
+    </button>
+    <button class="pill" id="themeBtn" type="button" data-mag>
+      <span class="pill__dot"></span><span id="themeState">CYAN</span>
+    </button>
+    <time class="clock" id="clock" datetime="">--:--:--</time>
+  </div>
+</header>
+
+<ul class="dots" id="dots" aria-label="Навигация по разделам">
+  <li><a href="#hero"   data-dot data-mag><span>00</span><em>entry</em></a></li>
+  <li><a href="#signal" data-dot data-mag><span>01</span><em>signal</em></a></li>
+  <li><a href="#uplink" data-dot data-mag><span>02</span><em>uplink</em></a></li>
+  <li><a href="#shell"  data-dot data-mag><span>03</span><em>shell</em></a></li>
+</ul>
+
+<main id="main">
+
+  <!-- ═══════════ 00 · HERO ═══════════ -->
+  <section class="hero" id="hero">
+    <div class="hero__grid" aria-hidden="true"></div>
+
+    <div class="hero__body">
+      <p class="eyebrow reveal">
+        <span class="blink"></span>NODE ONLINE · <span id="heroFreq">0x7A4C</span> MHz
+      </p>
+
+      <h1 class="title reveal" data-text="SPIRTOQ" id="heroTitle" data-mag role="button" tabindex="0"
+          aria-label="SPIRTOQ — нажми, чтобы проверить сигнал">
+        SPIRTOQ
+      </h1>
+
+      <p class="sub reveal">just&nbsp;vibing<span class="sub__dots">...</span></p>
+
+      <div class="hero__stats reveal" id="heroStats">
+        <div class="stat"><b id="statTz">—</b><span>timezone</span></div>
+        <div class="stat"><b id="statUp">00:00</b><span>uptime</span></div>
+        <div class="stat"><b id="statNet">—</b><span>uplink</span></div>
+        <div class="stat"><b id="statCores">—</b><span>threads</span></div>
+      </div>
+
+      <a class="cta reveal" href="#signal" data-mag>
+        <span>establish contact</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14m0 0l-6-6m6 6l6-6"/></svg>
+      </a>
     </div>
 
-    <div class="visitor-counter">
-        <svg class="eye-icon" viewBox="0 0 24 24">
-            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-        </svg>
-        <span id="stats-visits">0</span>
+    <div class="hero__scroll" aria-hidden="true"><i></i><span>scroll</span></div>
+  </section>
+
+  <!-- ═══════════ 01 · SIGNAL / now playing ═══════════ -->
+  <section class="sect" id="signal">
+    <div class="sect__head reveal">
+      <span class="sect__no">01</span>
+      <h2 class="sect__title">signal</h2>
+      <span class="sect__rule" aria-hidden="true"></span>
+      <span class="sect__hint">last.fm · live</span>
     </div>
 
-    <img src="https://mynickname.com/forum/Spirtoq.gif" id="secret-gif" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); z-index:100; transition:0.4s; border:1px solid var(--accent);">
+    <div class="np reveal" id="np">
+      <div class="np__art" data-tilt data-mag>
+        <div class="np__frame">
+          <img id="npImg" alt="" width="300" height="300" decoding="async">
+          <div class="np__glitch" aria-hidden="true"><img id="npImg2" alt="" decoding="async"></div>
+        </div>
+        <div class="np__ring" aria-hidden="true"></div>
+        <div class="np__eq" id="npEq" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+      </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        window.addEventListener('load', function() {
-            var r = new XMLHttpRequest();
-            r.addEventListener('load', function() {
-                try {
-                    var data = JSON.parse(this.responseText);
-                    document.getElementById('stats-visits').innerText = data.count || '0';
-                } catch(e) { console.error("Error loading stats"); }
-            });
-            r.open('GET', 'https://spirtoq.goatcounter.com/counter/TOTAL.json');
-            r.send();
-        });
+      <div class="np__meta">
+        <p class="np__label">now playing</p>
+        <h3 class="np__title" id="npTitle">acquiring stream…</h3>
+        <p class="np__artist" id="npArtist">—</p>
+        <p class="np__album"  id="npAlbum">—</p>
+        <dl class="np__facts">
+          <div><dt>state</dt><dd id="npState">SCANNING</dd></div>
+          <div><dt>at</dt><dd id="npWhen">—</dd></div>
+          <div><dt>src</dt><dd>ws.audioscrobbler</dd></div>
+        </dl>
+        <a class="np__link" id="npLink" href="https://last.fm/user/Spirtoq" target="_blank" rel="noopener" data-mag>
+          open in last.fm <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-3d'), alpha: true, antialias: true });
-        const size = Math.min(window.innerWidth, window.innerHeight) * 0.95;
-        renderer.setSize(size, size);
+  <!-- ═══════════ 02 · UPLINK / links ═══════════ -->
+  <section class="sect" id="uplink">
+    <div class="sect__head reveal">
+      <span class="sect__no">02</span>
+      <h2 class="sect__title">uplink</h2>
+      <span class="sect__rule" aria-hidden="true"></span>
+      <span class="sect__hint">4 channels locked</span>
+    </div>
 
-        const geometries = [
-            new THREE.IcosahedronGeometry(1.8, 0),
-            new THREE.TorusGeometry(1.2, 0.5, 12, 18),
-            new THREE.OctahedronGeometry(1.8, 0),
-            new THREE.DodecahedronGeometry(1.7, 0),
-            new THREE.BoxGeometry(1.6, 1.6, 1.6),
-            new THREE.ConeGeometry(1.5, 2.5, 6),
-            new THREE.CylinderGeometry(1, 1, 2.2, 8),
-            new THREE.TorusKnotGeometry(1, 0.3, 40, 8)
-        ];
+    <div class="cards" id="cards">
+      <a class="card" href="https://t.me/ExteraSpirtoq" target="_blank" rel="noopener"
+         data-tilt data-mag data-channel="telegram" data-key="t" data-label="telegram">
+        <span class="card__no">01</span>
+        <span class="card__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </span>
+        <span class="card__name">telegram</span>
+        <span class="card__desc">прямой канал связи</span>
+        <span class="card__go" aria-hidden="true">↗</span>
+        <span class="card__shine" aria-hidden="true"></span>
+      </a>
 
-        const material = new THREE.MeshPhysicalMaterial({
-            color: 0x00f3ff,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.6,
-            emissive: 0x00f3ff,
-            emissiveIntensity: 1.2
-        });
+      <a class="card" href="https://Last.fm/user/Spirtoq" target="_blank" rel="noopener"
+         data-tilt data-mag data-channel="lastfm" data-key="l" data-label="last.fm">
+        <span class="card__no">02</span>
+        <span class="card__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9.2"/><circle cx="12" cy="12" r="5.4" opacity=".45"/>
+            <circle cx="12" cy="12" r="2.1"/>
+            <path d="M12 2.8v1.6M12 19.6v1.6M2.8 12h1.6M19.6 12h1.6"/>
+          </svg>
+        </span>
+        <span class="card__name">last.fm</span>
+        <span class="card__desc">scrobbling log</span>
+        <span class="card__go" aria-hidden="true">↗</span>
+        <span class="card__shine" aria-hidden="true"></span>
+      </a>
 
-        const mesh = new THREE.Mesh(geometries[0], material);
-        scene.add(mesh);
-        const light1 = new THREE.PointLight(0xffffff, 2);
-        light1.position.set(5, 5, 5);
-        scene.add(light1);
-        camera.position.z = 4.5;
+      <a class="card" href="https://discord.gg/EkyNTSzQ" target="_blank" rel="noopener"
+         data-tilt data-mag data-channel="discord" data-key="d" data-label="discord">
+        <span class="card__no">03</span>
+        <span class="card__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M17.3 5H6.7A4 4 0 0 0 2.7 8.6c-.006.05-.01.1-.017.15C2.6 9.4 2 14.5 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.4-1.4a2 2 0 0 1 1.4-.6h4.4a2 2 0 0 1 1.4.6L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.5-.6-6.6-.7-7.3A4 4 0 0 0 17.3 5z"/>
+            <path d="M6.2 11.5h3.6M8 9.7v3.6M15 10.6h.01M18 12.4h.01"/>
+          </svg>
+        </span>
+        <span class="card__name">discord</span>
+        <span class="card__desc">voice comms</span>
+        <span class="card__go" aria-hidden="true">↗</span>
+        <span class="card__shine" aria-hidden="true"></span>
+      </a>
 
-        let shapeIdx = 0;
-        setInterval(() => {
-            shapeIdx = (shapeIdx + 1) % geometries.length;
-            mesh.geometry.dispose();
-            mesh.geometry = geometries[shapeIdx];
-        }, 3000);
+      <a class="card" href="https://shikimori.one/SpirtoQ" target="_blank" rel="noopener"
+         data-tilt data-mag data-channel="shikimori" data-key="s" data-label="shikimori">
+        <span class="card__no">04</span>
+        <span class="card__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2.5l2.1 6.2 6.2 2.1-6.2 2.1L12 19.1l-2.1-6.2L3.7 10.8l6.2-2.1L12 2.5z"/>
+            <path d="M18.6 16.4l.9 2.5 2.5.9-2.5.9-.9 2.5-.9-2.5-2.5-.9 2.5-.9.9-2.5z" opacity=".55"/>
+          </svg>
+        </span>
+        <span class="card__name">shikimori</span>
+        <span class="card__desc">media archive</span>
+        <span class="card__go" aria-hidden="true">↗</span>
+        <span class="card__shine" aria-hidden="true"></span>
+      </a>
+    </div>
+  </section>
 
-        function animate() {
-            requestAnimationFrame(animate);
-            mesh.rotation.x += 0.006;
-            mesh.rotation.y += 0.007;
-            const time = Date.now() * 0.002;
-            material.emissiveIntensity = 1 + Math.sin(time) * 0.5;
-            renderer.render(scene, camera);
-        }
-        animate();
+  <!-- ═══════════ 03 · SHELL / terminal ═══════════ -->
+  <section class="sect" id="shell">
+    <div class="sect__head reveal">
+      <span class="sect__no">03</span>
+      <h2 class="sect__title">shell</h2>
+      <span class="sect__rule" aria-hidden="true"></span>
+      <span class="sect__hint">type help</span>
+    </div>
 
-        async function updateMusic() {
-            try {
-                const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=Spirtoq&api_key=460cda35be2fbf4f28e8ea7a38580730&format=json&limit=1`);
-                const d = await r.json();
-                const track = d.recenttracks.track[0];
-                document.getElementById('player').style.opacity = '1';
-                document.getElementById('track-art').src = track.image[1]['#text'];
-                document.getElementById('track-name').innerText = track.name;
-                document.getElementById('track-artist').innerText = track.artist['#text'];
-            } catch(e) {}
-        }
-        updateMusic();
-        setInterval(updateMusic, 20000);
+    <div class="term reveal" id="term">
+      <div class="term__bar">
+        <span class="term__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="term__path">spirtoq@null-sector:~$</span>
+        <span class="term__badge" id="termBadge">idle</span>
+      </div>
 
-        const trigger = document.getElementById('avatar-trigger');
-        const gif = document.getElementById('secret-gif');
-        trigger.onclick = () => gif.style.transform = 'translate(-50%,-50%) scale(1)';
-        gif.onclick = () => gif.style.transform = 'translate(-50%,-50%) scale(0)';
+      <div class="term__out" id="termOut" tabindex="0" role="log" aria-live="polite" aria-label="Вывод терминала"></div>
 
-        window.onresize = () => {
-            const newSize = Math.min(window.innerWidth, window.innerHeight) * 0.95;
-            renderer.setSize(newSize, newSize);
-        };
-    </script>
+      <form class="term__in" id="termForm" autocomplete="off">
+        <label class="term__prompt" for="termIn">spirtoq@ns<span>:</span>~$</label>
+        <input id="termIn" name="cmd" type="text" spellcheck="false" autocapitalize="off"
+               autocorrect="off" aria-label="Командная строка">
+        <span class="term__caret" aria-hidden="true"></span>
+      </form>
+
+      <div class="term__hints" id="termHints" aria-hidden="true">
+        <span>help</span><span>neofetch</span><span>links</span><span>now</span>
+        <span>theme</span><span>matrix</span><span>god</span><span>clear</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="foot">
+  <div class="foot__l">
+    <span class="foot__sig" id="footSig">SPIRTOQ</span>
+    <span class="foot__build">build 2026.09.26 · null-sector v3</span>
+  </div>
+
+  <div class="foot__c">
+    <div class="counter" id="counter" title="уникальные посетители">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17a5 5 0 110-10 5 5 0 010 10zm0-2.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z"/>
+      </svg>
+      <span id="visits">0</span>
+    </div>
+    <span class="foot__note" id="footNote">статистика · goatcounter</span>
+  </div>
+</footer>
+
+<!-- ═══════════ OVERLAYS ═══════════ -->
+<div class="eject" id="eject" hidden>
+  <button class="eject__x" id="ejectX" type="button" aria-label="закрыть">✕</button>
+  <img id="ejectImg" alt="avatar" decoding="async">
+  <span class="eject__cap">SIGNAL ACQUIRED — click anywhere to dismiss</span>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script src="js/gl.js" defer></script>
+<script src="js/audio.js" defer></script>
+<script src="js/terminal.js" defer></script>
+<script src="js/app.js" defer></script>
+
+<!-- GoatCounter -->
+<script data-goatcounter="https://spirtoq.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
-    </html>
-                
+</html>

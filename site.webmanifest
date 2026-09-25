@@ -1,0 +1,15 @@
+{
+  "name": "SPIRTOQ // NULL SECTOR",
+  "short_name": "SPIRTOQ",
+  "description": "Personal transmission node. Deep web frequency, live telemetry, interactive terminal.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#04060a",
+  "theme_color": "#04060a",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="void" data-cursor="off">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 // SIGNAL LOST</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#04060a">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{ --a1:#fff; --a2:#9aa8b6; --bg:#04060a; --fg:#f2f4f7; --muted:#67727e;
+       --line:rgba(255,255,255,.13); --line-2:rgba(255,255,255,.3); }
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0 }
+body{ font-family:'JetBrains Mono',ui-monospace,monospace; background:var(--bg); color:var(--fg);
+      min-height:100dvh; display:grid; place-items:center; padding:32px; overflow:hidden }
+.grid{ position:fixed; inset:0; pointer-events:none; opacity:.4;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:48px 48px;
+  -webkit-mask-image:radial-gradient(60% 60% at 50% 50%,#000,transparent 75%);
+          mask-image:radial-gradient(60% 60% at 50% 50%,#000,transparent 75%) }
+.glow{ position:fixed; inset:0; pointer-events:none;
+  background:radial-gradient(60% 50% at 50% 42%,rgba(255,255,255,.09),transparent 70%) }
+.box{ position:relative; text-align:center; max-width:640px }
+h1{ font-family:'Syncopate'; font-weight:700; font-size:clamp(4rem,20vw,11rem);
+    line-height:.85; letter-spacing:-.04em; position:relative }
+h1::before,h1::after{ content:'404'; position:absolute; inset:0 }
+h1::before{ color:var(--a2); opacity:.5; animation:j 3.4s steps(1) infinite }
+h1::after { color:var(--a1); opacity:.35; animation:k 3.4s steps(1) infinite }
+@keyframes j{ 0%,90%,100%{transform:none;opacity:0} 91%{transform:translate(-6px,3px);opacity:.6}
+              94%{transform:translate(5px,-2px);opacity:.4} }
+@keyframes k{ 0%,92%,100%{transform:none;opacity:0} 93%{transform:translate(5px,2px);opacity:.5} }
+p{ margin-top:18px; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted) }
+pre{ margin-top:26px; text-align:left; font-size:12px; line-height:1.9; color:#8b98a5;
+     border:1px solid var(--line); padding:16px 18px; background:rgba(255,255,255,.02) }
+pre b{ color:var(--fg); font-weight:500 } pre u{ text-decoration:none; color:var(--a2) }
+a{ display:inline-flex; align-items:center; gap:10px; margin-top:30px; padding:14px 26px;
+   border:1px solid var(--line-2); color:var(--fg); text-decoration:none;
+   font-size:10px; letter-spacing:.26em; text-transform:uppercase; transition:.35s }
+a:hover{ background:#fff; color:#000; border-color:#fff }
+.c{ position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+    font-size:9px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted) }
+</style>
+</head>
+<body>
+<div class="grid"></div><div class="glow"></div>
+<div class="box">
+  <h1>404</h1>
+  <p>signal lost · узел не найден</p>
+  <pre><b>traceroute</b> → <u>404</u>
+<b>hop 1</b>    edge-cache   1 ms
+<b>hop 2</b>    null-sector  <u>dead</u>
+<b>hop 3</b>    ─────────────────
+<b>result</b>   <u>NO_ROUTE_TO_HOST</u>
+
+этот адрес не существует, был удалён
+или никогда не был записан.</pre>
+  <a href="/">← вернуться в null-sector</a>
+</div>
+<div class="c">spirtoq.github.io</div>
+</body>
+</html>
