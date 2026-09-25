@@ -221,6 +221,12 @@
         },
         'signal.log': function () {
           var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
+          if (k.npError) {
+            write('последний scrobble: НЕИЗВЕСТЕН', 'err');
+            write(k.npError, 'out');
+            write('канал: ws.audioscrobbler.com/2.0', 'dim');
+            return;
+          }
           write('последний scrobble:', 'dim');
           write((k.npTitle || '—'), 'ok');
           write((k.npArtist || '—') + ' — ' + (k.npAlbum || '?'), 'out');
@@ -249,6 +255,12 @@
 
     now: function () {
       var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
+      if (k.npError) {
+        write('▶ — трек не получен', 'err');
+        write('  ' + k.npError, 'out');
+        write('  ключ лежит в js/app.js. он может быть мёртвым.', 'dim');
+        return;
+      }
       write('▶ ' + (k.npTitle || '—'), 'ok');
       write('  ' + (k.npArtist || '—'), 'out');
       write('  ' + (k.npAlbum || 'альбом неизвестен'), 'dim');

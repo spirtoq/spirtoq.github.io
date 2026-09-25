@@ -289,27 +289,60 @@
     var url = 'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks' +
               '&user=' + encodeURIComponent(LASTFM_USER) +
               '&api_key=' + LASTFM_KEY + '&format=json&limit=1';
-    var done = false;
-    var to = setTimeout(function () { if (!done) fail(); }, 9000);
 
-    function fail() {
-      if (done) return; done = true; clearTimeout(to);
-      if (npEls.title && /acquiring/i.test(npEls.title.textContent)) {
-        npEls.title.textContent = 'сигнал потерян';
-        npEls.artist.textContent = 'last.fm не отвечает';
-        npEls.state.textContent = 'NO SIGNAL';
-        npEls.state.style.color = 'var(--a2)';
-      }
+    /* `settled` guards BOTH the timeout and the response, so whichever lands
+       first wins. Two separate flags previously meant the failure branch was
+       unreachable: the response handler set `done` before calling fail(),
+       and fail() bailed on that same flag. */
+    var settled = false;
+    var to = setTimeout(function () { fail('превышено время ожидания'); }, 9000);
+
+    function fail(reason) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(to);
+      S.npError = reason;
+      if (!npEls.title) return;
+      npEls.title.textContent = 'сигнал потерян';
+      npEls.artist.textContent = reason;
+      npEls.album.textContent = 'ws.audioscrobbler.com · проверь api-ключ';
+      npEls.state.textContent = 'NO SIGNAL';
+      npEls.state.style.color = 'var(--a2)';
+      if (npEls.box) npEls.box.classList.remove('live');
+    }
+
+    function accept(track) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(to);
+      S.npError = null;
+      if (npEls.state) npEls.state.style.color = '';
+      renderTrack(track);
     }
 
     fetch(url, { mode: 'cors' })
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        done = true; clearTimeout(to);
-        var t = d && d.recenttracks && d.recenttracks.track && d.recenttracks.track[0];
-        if (t) renderTrack(t);
+      .then(function (r) {
+        return r.json().then(
+          function (d) { return { d: d }; },
+          function () { return { d: null }; }
+        );
       })
-      .catch(fail);
+      .then(function (res) {
+        var d = res.d;
+
+        /* the API answers 200 with {error:11} when the key is dead */
+        if (d && d.error) {
+          fail('last.fm #' + d.error + ' · ' + (d.message || 'access denied'));
+          return;
+        }
+        if (!d) { fail('нечитаемый ответ last.fm'); return; }
+
+        var t = d.recenttracks && d.recenttracks.track && d.recenttracks.track[0];
+        if (!t) { fail('тишина — ни одного scrobble'); return; }
+
+        accept(t);
+      })
+      .catch(function () { fail('сеть недоступна или блокировка CORS'); });
   }
 
   /* re-evaluate "x мин назад" locally, no refetch needed */
@@ -631,7 +664,8 @@
         date: d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
         npTitle: S.np && S.np.title, npArtist: S.np && S.np.artist,
         npAlbum: S.np && S.np.album, npWhen: S.np && S.np.when,
-        npState: S.np ? 'SYNCED' : 'IDLE'
+        npState: S.npError ? 'NO SIGNAL' : (S.np ? 'SYNCED' : 'IDLE'),
+        npError: S.npError
       };
     };
     T.ctx.setTheme = setTheme;
