@@ -83,7 +83,9 @@
         ['ls / dir',      'содержимое ноды'],
         ['cat <file>',    'прочитать файл'],
         ['links',         'открытые каналы'],
-        ['now / np',      'что играет сейчас'],
+        ['now / np',      'что в эфире прямо сейчас'],
+        ['fm / radio',    'станции: fm 2 · fm dronezone'],
+        ['nick',          'скопировать ник discord'],
         ['play <url>',    'проверить любой URL'],
         ['ping',          'задержка до шлюза'],
         ['time / date',   'локальное время'],
@@ -180,7 +182,7 @@
           write('Собираю частоты, слушаю музыку и иногда пишу шейдеры.', 'out');
           write('Эта страница — личный передатчик в пустоту. Она живая:', 'dim');
           write('  · фон рисуется шейдером в реальном времени', 'ok');
-          write('  · музыка приходит прямо с last.fm', 'ok');
+          write('  · радио играет прямо в браузере, 4 станции', 'ok');
           write('  · счётчик считает, сколько нас тут было', 'ok');
         },
         'boot.log': function () {
@@ -188,7 +190,7 @@
             '00.000  POST .................. ok',
             '00.104  mount /dev/shader2 .... ok',
             '00.212  load font:Syncopate .... ok',
-            '00.488  init last.fm socket ... ok',
+            '00.488  mount /dev/icecast2 ... ok',
             '00.771  negotiate uplink ...... ok',
             '01.130  handshake ............. ok',
             '01.402  <b>GOD MODE AVAILABLE</b>  (konami)',
@@ -210,27 +212,22 @@
           write('fps считается в консоли. там тихо.', 'dim');
         },
         'secrets/three': function () {
-          write('ключ last.fm лежит прямо в коде. я знаю.', 'out');
-          write('мне всё равно. пусть пользуются.', 'ok');
-          write('но если ты мимоходом откроешь DevTools — ты уже один из тех, кто читает.', 'dim');
+          write('радио тянется с soma.fm по прямой ссылке, без ключа.', 'out');
+          write('и визуализатор честный: если поток не даёт звук — он это скажет.', 'ok');
+          write('если ты читаешь это, ты уже видел консоль. ты один из тех.', 'dim');
         },
         'index.html': function () {
           write('11 350 байт. весь сайт в одном файле.', 'out');
-          write('старая версия. новая разбита на 6.', 'dim');
+          write('старая версия. новая разбита на файлы.', 'dim');
           write('grep -r "EXTRACT_ALL" .', 'ok');
         },
         'signal.log': function () {
           var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-          if (k.npError) {
-            write('последний scrobble: НЕИЗВЕСТЕН', 'err');
-            write(k.npError, 'out');
-            write('канал: ws.audioscrobbler.com/2.0', 'dim');
-            return;
-          }
-          write('последний scrobble:', 'dim');
-          write((k.npTitle || '—'), 'ok');
-          write((k.npArtist || '—') + ' — ' + (k.npAlbum || '?'), 'out');
-          write('канал: ws.audioscrobbler.com/2.0', 'dim');
+          var r = k.radio || {};
+          write('эфир:', 'dim');
+          write((r.title || 'тишина') + ' — ' + (r.artist || '?'), 'ok');
+          write('станция: ' + (r.station || '?') + ' · ' + (r.playing ? 'играет' : 'пауза'), 'out');
+          write('канал: ice2.somafm.com · метаданные somafm.com', 'dim');
         }
       };
       var f = (arg || '').toLowerCase();
@@ -245,28 +242,68 @@
       var L = k.links || [];
       var s = '<table>';
       L.forEach(function (l) {
-        s += '<tr><td>' + esc(pad(l.key, 3)) + '</td><td>' +
-             '<a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.name) + '</a></td>' +
+        var what = l.copy
+          ? '<span class="tl--ok">' + esc(l.copy) + '</span> <span class="tl--dim">(копируется)</span>'
+          : '<a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.name) + '</a>';
+        s += '<tr><td>' + esc(pad(l.key, 3)) + '</td><td>' + what + '</td>' +
              '<td class="tl--dim">' + esc(l.note) + '</td></tr>';
       });
       html(s + '</table>');
-      write('горячие клавиши T · L · D · S работают, пока карточки на экране', 'dim');
+      write('горячие клавиши T · D · O · S работают, пока карточки на экране', 'dim');
+    },
+
+    nick: function () {
+      var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
+      var d = (k.links || []).filter(function (l) { return l.copy; })[0];
+      if (!d) { write('ника нет', 'err'); return; }
+      write('ник в discord: ' + d.copy, 'ok');
+      if (SPIRTOQctx.copyNick) {
+        SPIRTOQctx.copyNick(d);
+        write('скопировано. вставь в поиск людей в дискорде.', 'dim');
+      } else {
+        write('скопируй вручную — ' + d.copy, 'dim');
+      }
     },
 
     now: function () {
       var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-      if (k.npError) {
-        write('▶ — трек не получен', 'err');
-        write('  ' + k.npError, 'out');
-        write('  ключ лежит в js/app.js. он может быть мёртвым.', 'dim');
-        return;
-      }
-      write('▶ ' + (k.npTitle || '—'), 'ok');
-      write('  ' + (k.npArtist || '—'), 'out');
-      write('  ' + (k.npAlbum || 'альбом неизвестен'), 'dim');
-      write('  ' + (k.npWhen || 'время неизвестно') + ' · ' + (k.npState || 'IDLE'), 'dim');
+      var r = k.radio || {};
+      if (!r.station) { write('радио не инициализировано', 'err'); return; }
+      write((r.playing ? '▶ ' : '❚❚ ') + r.station + '  [' + (r.playing ? 'ON AIR' : 'STANDBY') + ']',
+            r.playing ? 'ok' : 'dim');
+      write('  ' + (r.title || 'тишина в эфире'), r.title ? 'out' : 'dim');
+      if (r.artist) write('  ' + r.artist, 'out');
+      if (r.album) write('  ' + r.album, 'dim');
+      write('  визуализатор: ' + (r.analyser === 'live' ? 'реагирует на звук' : 'декоративный'),
+            r.analyser === 'live' ? 'hi' : 'dim');
     },
     np: function () { CMDS.now(); },
+
+    radio: function (arg) {
+      var R = SPIRTOQ.radio;
+      if (!R) { write('радио недоступно', 'err'); return; }
+      var st = R.stations;
+      if (!arg) {
+        write('доступные станции (номер или имя):', 'hi');
+        st.forEach(function (s, i) {
+          write('  ' + pad(i + 1, 3) + s.id.padEnd(14) + pad(s.name, 16) + s.tag, 'out');
+        });
+        write(' fm <n|name> — переключить и включить', 'dim');
+        write(' fm stop / fm play', 'dim');
+        return;
+      }
+      var a = String(arg).toLowerCase();
+      if (a === 'stop' || a === 'off') { R.pause(); write('пауза', 'dim'); return; }
+      if (a === 'play' || a === 'on') { R.play(); write('воспроизведение', 'ok'); return; }
+
+      var idx = /^\d+$/.test(a) ? +a - 1
+              : st.map(function (s) { return s.id; }).indexOf(a);
+      if (idx < 0 || idx >= st.length) { write('fm: станция «' + arg + '» не найдена', 'err'); return; }
+      R.pick(idx);
+      write('→ ' + st[idx].name + ' · ' + st[idx].tag, 'ok');
+    },
+    fm: function (a) { CMDS.radio(a); },
+    stations: function () { CMDS.radio(''); },
 
     play: function (arg) {
       if (!arg) { write('play: укажи url', 'err'); return; }
@@ -388,8 +425,9 @@
       if (!arg) { write('grep: нужен паттерн', 'err'); return; }
       write('Searching ' + arg + ' ...', 'dim');
       var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-      var hay = ['index.html', 'css/main.css', 'js/gl.js', 'js/audio.js', 'js/terminal.js', 'js/app.js']
-        .join('\n') + '\n' + (k.npTitle || '') + '\n' + (k.npArtist || '');
+      var hay = ['index.html', 'css/main.css', 'js/gl.js', 'js/audio.js', 'js/radio.js',
+                 'js/terminal.js', 'js/app.js']
+        .join('\n') + '\n' + ((k.radio && k.radio.artist) || '') + '\n' + ((k.radio && k.radio.title) || '');
       var re = new RegExp(String(arg).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
       var hits = hay.split('\n').filter(function (l) { return re.test(l); });
       if (!hits.length) { write('0 совпадений. чисто.', 'dim'); return; }

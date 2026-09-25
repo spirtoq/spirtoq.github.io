@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
    app.js — orchestration
    boot · grain · cursor · magnet · tilt · reveal · clock · stats
-   last.fm · goatcounter · themes · sfx · konami · easter eggs
+   radio · goatcounter · themes · sfx · konami · easter eggs
    ═══════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
@@ -14,21 +14,21 @@
   var TUNE = matchMedia('(pointer: fine)').matches;
   var coarse = matchMedia('(pointer: coarse)').matches;
 
-  var LASTFM_KEY = '460cda35be2fbf4f28e8ea7a38580730';
-  var LASTFM_USER = 'Spirtoq';
   var BOOT_SEEN = 'ns3-booted';
+  var DC_NICK = 'spirtoq_';
 
   var THEMES = ['cyan', 'amber', 'matrix', 'void', 'blood'];
+  /* `copy` means: no outbound link, the click puts the value on the clipboard */
   var LINKS = [
-    { key: 'T', name: 'telegram', note: 'прямой канал связи', url: 'https://t.me/ExteraSpirtoq' },
-    { key: 'L', name: 'last.fm',   note: 'scrobbling log',      url: 'https://Last.fm/user/Spirtoq' },
-    { key: 'D', name: 'discord',   note: 'voice comms',         url: 'https://discord.gg/EkyNTSzQ' },
-    { key: 'S', name: 'shikimori', note: 'media archive',       url: 'https://shikimori.one/SpirtoQ' }
+    { key: 'T', name: 'telegram', note: '@ExteraSpirtoq', url: 'https://t.me/ExteraSpirtoq' },
+    { key: 'D', name: 'discord',   note: 'ник: ' + DC_NICK, copy: DC_NICK },
+    { key: 'O', name: 'osu!',      note: '#39388621',      url: 'https://osu.ppy.sh/users/39388621' },
+    { key: 'S', name: 'steam',     note: '@spirtoq',        url: 'https://steamcommunity.com/id/spirtoq/' }
   ];
 
   var S = {
     theme: 'cyan', sfx: false, god: false, booted: false,
-    t0: performance.now(), visits: null, np: null, fps: 0,
+    t0: performance.now(), visits: null, fps: 0,
     sessions: 1, firstRun: true
   };
 
@@ -232,126 +232,6 @@
     sessionStorage.setItem('ns3-sessions', String(S.sessions + 1));
   }
 
-  /* ═══════════ 08 · Last.fm now-playing ═══════════ */
-  var npEls = {}, lastTrack = '';
-  function npNodes() {
-    npEls = {
-      box: $('#np'), img: $('#npImg'), img2: $('#npImg2'), title: $('#npTitle'),
-      artist: $('#npArtist'), album: $('#npAlbum'), state: $('#npState'),
-      when: $('#npWhen'), link: $('#npLink')
-    };
-  }
-
-  function ago(sec) {
-    sec = Math.max(0, Math.round(sec));
-    if (sec < 45) return 'только что';
-    var m = Math.round(sec / 60);
-    if (m < 60) return m + ' мин назад';
-    var h = Math.round(m / 60);
-    if (h < 24) return h + ' ч назад';
-    return Math.round(h / 24) + ' дн назад';
-  }
-
-  function renderTrack(t) {
-    if (!t) return;
-    var art = (t.image || []).slice().sort(function (a, b) { return (b.width || 0) - (a.width || 0); })[0];
-    var url = art ? art['#text'] : '';
-    var now = t['@attr'] && t['@attr'].nowplaying === 'true';
-    var ts = t.date && t.date.uts ? parseInt(t.date.uts, 10) : 0;
-
-    S.np = {
-      title: t.name || '—',
-      artist: t.artist ? t.artist['#text'] : '—',
-      album: t.album ? t.album['#text'] : '',
-      when: ts ? ago((Date.now() / 1000) - ts) : 'сейчас',
-      uts: ts,
-      now: now
-    };
-
-    if (npEls.title) npEls.title.textContent = S.np.title;
-    if (npEls.artist) npEls.artist.textContent = S.np.artist;
-    if (npEls.album)  npEls.album.textContent  = S.np.album || 'альбом неизвестен';
-    if (npEls.when)   npEls.when.textContent   = S.np.when;
-    if (npEls.state)  npEls.state.textContent  = now ? 'SCROBBING' : 'PAST SCROBBLE';
-    if (npEls.link && t.url) npEls.link.href = t.url;
-    if (url) {
-      if (npEls.img)  { npEls.img.src = url;  npEls.img.alt  = S.np.title; }
-      if (npEls.img2) npEls.img2.src = url;
-    }
-    if (npEls.box) {
-      npEls.box.classList.toggle('live', now);
-      root.classList.toggle('live', now);
-    }
-    lastTrack = S.np.title + '|' + S.np.artist;
-  }
-
-  function pollTrack() {
-    var url = 'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks' +
-              '&user=' + encodeURIComponent(LASTFM_USER) +
-              '&api_key=' + LASTFM_KEY + '&format=json&limit=1';
-
-    /* `settled` guards BOTH the timeout and the response, so whichever lands
-       first wins. Two separate flags previously meant the failure branch was
-       unreachable: the response handler set `done` before calling fail(),
-       and fail() bailed on that same flag. */
-    var settled = false;
-    var to = setTimeout(function () { fail('превышено время ожидания'); }, 9000);
-
-    function fail(reason) {
-      if (settled) return;
-      settled = true;
-      clearTimeout(to);
-      S.npError = reason;
-      if (!npEls.title) return;
-      npEls.title.textContent = 'сигнал потерян';
-      npEls.artist.textContent = reason;
-      npEls.album.textContent = 'ws.audioscrobbler.com · проверь api-ключ';
-      npEls.state.textContent = 'NO SIGNAL';
-      npEls.state.style.color = 'var(--a2)';
-      if (npEls.box) npEls.box.classList.remove('live');
-    }
-
-    function accept(track) {
-      if (settled) return;
-      settled = true;
-      clearTimeout(to);
-      S.npError = null;
-      if (npEls.state) npEls.state.style.color = '';
-      renderTrack(track);
-    }
-
-    fetch(url, { mode: 'cors' })
-      .then(function (r) {
-        return r.json().then(
-          function (d) { return { d: d }; },
-          function () { return { d: null }; }
-        );
-      })
-      .then(function (res) {
-        var d = res.d;
-
-        /* the API answers 200 with {error:11} when the key is dead */
-        if (d && d.error) {
-          fail('last.fm #' + d.error + ' · ' + (d.message || 'access denied'));
-          return;
-        }
-        if (!d) { fail('нечитаемый ответ last.fm'); return; }
-
-        var t = d.recenttracks && d.recenttracks.track && d.recenttracks.track[0];
-        if (!t) { fail('тишина — ни одного scrobble'); return; }
-
-        accept(t);
-      })
-      .catch(function () { fail('сеть недоступна или блокировка CORS'); });
-  }
-
-  /* re-evaluate "x мин назад" locally, no refetch needed */
-  setInterval(function () {
-    if (!S.np || !S.np.uts || !npEls.when) return;
-    S.np.when = ago((Date.now() / 1000) - S.np.uts);
-    npEls.when.textContent = S.np.when;
-  }, 30000);
-
   /* ═══════════ 09 · goatcounter ═══════════ */
   function visits() {
     var el = $('#visits');
@@ -500,6 +380,51 @@
     }, { passive: true });
   }
 
+  /* ═══════════ 15b · clipboard: the Discord nick ═══════════ */
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    /* older browsers and any non-secure origin land here */
+    return new Promise(function (resolve, reject) {
+      var ta = doc.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+      doc.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      var ok = false;
+      try { ok = doc.execCommand('copy'); } catch (e) { ok = false; }
+      doc.body.removeChild(ta);
+      ok ? resolve() : reject(new Error('copy blocked'));
+    });
+  }
+
+  function copyNick(L) {
+    var value = (L && L.copy) || DC_NICK;
+    var card = $('#dcCard');
+    copyText(value).then(function () {
+      if (card) {
+        card.classList.add('done');
+        setTimeout(function () { card.classList.remove('done'); }, 1600);
+      }
+      toast('ник скопирован · ' + value, 2400);
+      SPIRTOQ.audio.sfx.ok();
+    }, function () {
+      toast('не удалось скопировать · ник: ' + value, 3600);
+    });
+  }
+
+  function initCopy() {
+    $$('[data-copy]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        copyNick({ copy: el.dataset.copy });
+      });
+    });
+  }
+
   /* ═══════════ 16 · shortcuts ═══════════ */
   function initKeys() {
     var uplink = doc.getElementById('uplink');
@@ -521,8 +446,7 @@
           var L = LINKS.filter(function (l) { return l.key === e.key.toUpperCase(); })[0];
           if (L && e.key.length === 1) {
             e.preventDefault();
-            toast(L.name + ' · открываю…', 1600);
-            open(L.url);
+            activate(L);
             return;
           }
         }
@@ -539,6 +463,12 @@
       }
     });
 
+    /* a link either opens, or copies its value to the clipboard */
+    function activate(L) {
+      if (L.copy) { copyNick(L); return; }
+      toast(L.name + ' · открываю…', 1600);
+      open(L.url);
+    }
     function open(u) { global.open(u, '_blank', 'noopener'); }
     function toggleFull() {
       if (!doc.fullscreenElement) {
@@ -572,9 +502,9 @@
     ['<b>load</b> font:SpaceGrotesk ........ ok', 80],
     ['<b>load</b> font:JetBrainsMono ....... ok', 80],
     ['<b>init</b> webgl2 context ........... <i>ok</i>', 140],
-    ['<b>scan</b> last.fm 2.0 ............. <i>ok</i>', 150],
+    ['<b>mount</b> /dev/icecast2 .......... <i>ok</i>', 150],
     ['<b>scan</b> goatcounter .............. <i>ok</i>', 110],
-    ['<b>mount</b> /uplink/{t,l,d,s} ....... ok', 120],
+    ['<b>mount</b> /uplink/{t,d,o,s} ....... ok', 120],
     ['negotiating uplink .................. <i>ok</i>', 130],
     ['handshake <b>ACCEPTED</b>', 100],
     ['<b>GOD MODE</b> available — ↑↑↓↓←→←→BA', 260],
@@ -636,7 +566,6 @@
     } catch (e) {}
     setTheme(THEMES.indexOf(saved) > -1 ? saved : 'cyan', true);
 
-    npNodes();
     stats();
     tick();
     setInterval(tick, 1000);
@@ -662,20 +591,20 @@
         fps: S.fps, links: LINKS, themes: THEMES,
         time: pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()),
         date: d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
-        npTitle: S.np && S.np.title, npArtist: S.np && S.np.artist,
-        npAlbum: S.np && S.np.album, npWhen: S.np && S.np.when,
-        npState: S.npError ? 'NO SIGNAL' : (S.np ? 'SYNCED' : 'IDLE'),
-        npError: S.npError
+        radio: SPIRTOQ.radio ? SPIRTOQ.radio.state() : null
       };
     };
     T.ctx.setTheme = setTheme;
     T.ctx.toggleGod = toggleGod;
     T.ctx.syncUI = syncUI;
+    T.ctx.copyNick = copyNick;
 
     /* wire UI */
     var tb = $('#themeBtn'); if (tb) tb.addEventListener('click', nextTheme);
     var sb = $('#sfxBtn');   if (sb) sb.addEventListener('click', toggleSfx);
     syncUI();
+    initCopy();
+    if (SPIRTOQ.radio) SPIRTOQ.radio.init();
 
     initScroll();
     initKeys();
@@ -684,8 +613,6 @@
     initFps();
 
     /* data */
-    pollTrack();
-    setInterval(pollTrack, 20000);
     visits();
 
     /* boot */

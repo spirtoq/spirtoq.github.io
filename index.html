@@ -56,12 +56,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       </div>
       <div style="color:#00f3ff;margin-bottom:16px">JavaScript отключён.</div>
       <div style="color:#8fa6b8">
-        Фон, музыка и терминал без него не запустятся.<br>
+        Фон, радио и терминал без него не запустятся.<br>
         Каналы связи:<br>
         <a style="color:#00f3ff" href="https://t.me/ExteraSpirtoq">telegram</a> ·
-        <a style="color:#00f3ff" href="https://Last.fm/user/Spirtoq">last.fm</a> ·
-        <a style="color:#00f3ff" href="https://discord.gg/EkyNTSzQ">discord</a> ·
-        <a style="color:#00f3ff" href="https://shikimori.one/SpirtoQ">shikimori</a>
+        <a style="color:#00f3ff" href="https://osu.ppy.sh/users/39388621">osu!</a> ·
+        <a style="color:#00f3ff" href="https://steamcommunity.com/id/spirtoq/">steam</a><br>
+        ник в discord: <b style="color:#d9e7f2">spirtoq_</b>
       </div>
     </div>
   </div>
@@ -165,36 +165,58 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <span class="sect__no">01</span>
       <h2 class="sect__title">signal</h2>
       <span class="sect__rule" aria-hidden="true"></span>
-      <span class="sect__hint">last.fm · live</span>
+      <span class="sect__hint">soma.fm · live</span>
     </div>
 
-    <div class="np reveal" id="np">
-      <div class="np__art" data-tilt data-mag>
-        <div class="np__frame">
-          <img id="npImg" alt="" width="300" height="300" decoding="async">
-          <div class="np__glitch" aria-hidden="true"><img id="npImg2" alt="" decoding="async"></div>
-        </div>
-        <div class="np__ring" aria-hidden="true"></div>
-        <div class="np__eq" id="npEq" aria-hidden="true">
-          <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-        </div>
+    <div class="radio reveal" id="radio">
+      <!-- left: deck + spectrum -->
+      <div class="radio__deck" data-mag>
+        <canvas id="spectrum" class="radio__spec" aria-hidden="true"></canvas>
+
+        <button class="radio__play" id="radioPlay" type="button" data-mag
+                aria-label="Слушать" aria-pressed="false">
+          <span class="radio__playring" aria-hidden="true"></span>
+          <span class="radio__playicon" id="radioPlayIcon" aria-hidden="true">▶</span>
+        </button>
+
+        <div class="radio__corner radio__corner--tl" aria-hidden="true"></div>
+        <div class="radio__corner radio__corner--br" aria-hidden="true"></div>
+
+        <p class="radio__hint" id="radioHint">нажми play · поток 128 kbps</p>
+        <div id="radioAudio"></div>
       </div>
 
-      <div class="np__meta">
-        <p class="np__label">now playing</p>
-        <h3 class="np__title" id="npTitle">acquiring stream…</h3>
-        <p class="np__artist" id="npArtist">—</p>
-        <p class="np__album"  id="npAlbum">—</p>
-        <dl class="np__facts">
-          <div><dt>state</dt><dd id="npState">SCANNING</dd></div>
-          <div><dt>at</dt><dd id="npWhen">—</dd></div>
-          <div><dt>src</dt><dd>ws.audioscrobbler</dd></div>
+      <!-- right: what's on air right now -->
+      <div class="radio__meta">
+        <p class="radio__label"><span class="radio__dot" aria-hidden="true"></span>on air</p>
+
+        <h3 class="radio__track" id="radioTrack">тишина в эфире</h3>
+        <p class="radio__artist" id="radioArtist">—</p>
+        <p class="radio__album"  id="radioAlbum">—</p>
+
+        <dl class="radio__facts">
+          <div><dt>station</dt><dd id="radioStation">Groove Salad</dd></div>
+          <div><dt>mood</dt><dd id="radioMood">vibing</dd></div>
+          <div><dt>state</dt><dd id="radioState">STANDBY</dd></div>
         </dl>
-        <a class="np__link" id="npLink" href="https://last.fm/user/Spirtoq" target="_blank" rel="noopener" data-mag>
-          open in last.fm <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
-        </a>
+
+        <div class="radio__vol">
+          <label for="radioVol">vol</label>
+          <span class="radio__volwrap">
+            <input id="radioVol" type="range" min="0" max="100" value="75" step="1"
+                   aria-label="Громкость">
+            <span class="radio__voltrack" aria-hidden="true"><i id="radioVolFill"></i></span>
+          </span>
+        </div>
       </div>
     </div>
+
+    <div class="stns reveal" id="radioStations" role="group" aria-label="Станции"></div>
+
+    <p class="radio__credit">
+      потоки и метаданные — <a href="https://somafm.com/" target="_blank" rel="noopener">SomaFM</a>,
+      без ключей и трекеров
+    </p>
   </section>
 
   <!-- ═══════════ 02 · UPLINK / links ═══════════ -->
@@ -207,6 +229,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </div>
 
     <div class="cards" id="cards">
+      <!-- 01 · telegram -->
       <a class="card" href="https://t.me/ExteraSpirtoq" target="_blank" rel="noopener"
          data-tilt data-mag data-channel="telegram" data-key="t" data-label="telegram">
         <span class="card__no">01</span>
@@ -214,30 +237,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <svg viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         </span>
         <span class="card__name">telegram</span>
-        <span class="card__desc">прямой канал связи</span>
+        <span class="card__desc">@ExteraSpirtoq</span>
         <span class="card__go" aria-hidden="true">↗</span>
         <span class="card__shine" aria-hidden="true"></span>
       </a>
 
-      <a class="card" href="https://Last.fm/user/Spirtoq" target="_blank" rel="noopener"
-         data-tilt data-mag data-channel="lastfm" data-key="l" data-label="last.fm">
+      <!-- 02 · discord — copies the nick instead of following a link -->
+      <button class="card card--copy" type="button" id="dcCard"
+              data-tilt data-mag data-copy="spirtoq_" data-channel="discord" data-key="d"
+              data-label="скопировать ник"
+              aria-label="Скопировать ник Discord: spirtoq_">
         <span class="card__no">02</span>
-        <span class="card__ico" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="9.2"/><circle cx="12" cy="12" r="5.4" opacity=".45"/>
-            <circle cx="12" cy="12" r="2.1"/>
-            <path d="M12 2.8v1.6M12 19.6v1.6M2.8 12h1.6M19.6 12h1.6"/>
-          </svg>
-        </span>
-        <span class="card__name">last.fm</span>
-        <span class="card__desc">scrobbling log</span>
-        <span class="card__go" aria-hidden="true">↗</span>
-        <span class="card__shine" aria-hidden="true"></span>
-      </a>
-
-      <a class="card" href="https://discord.gg/EkyNTSzQ" target="_blank" rel="noopener"
-         data-tilt data-mag data-channel="discord" data-key="d" data-label="discord">
-        <span class="card__no">03</span>
         <span class="card__ico" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <path d="M17.3 5H6.7A4 4 0 0 0 2.7 8.6c-.006.05-.01.1-.017.15C2.6 9.4 2 14.5 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.4-1.4a2 2 0 0 1 1.4-.6h4.4a2 2 0 0 1 1.4.6L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.5-.6-6.6-.7-7.3A4 4 0 0 0 17.3 5z"/>
@@ -245,26 +255,49 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           </svg>
         </span>
         <span class="card__name">discord</span>
-        <span class="card__desc">voice comms</span>
+        <span class="card__desc">ник: <b class="card__val">spirtoq_</b></span>
+        <span class="card__go" aria-hidden="true">⧉</span>
+        <span class="card__shine" aria-hidden="true"></span>
+      </button>
+
+      <!-- 03 · osu! -->
+      <a class="card" href="https://osu.ppy.sh/users/39388621" target="_blank" rel="noopener"
+         data-tilt data-mag data-channel="osu" data-key="o" data-label="osu! профиль">
+        <span class="card__no">03</span>
+        <span class="card__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9.2"/>
+            <circle cx="12" cy="12" r="4.6" opacity=".5"/>
+            <path d="M12 1.4v4.2M12 18.4v4.2M1.4 12h4.2M18.4 12h4.2"/>
+            <circle cx="12" cy="12" r="1.1"/>
+          </svg>
+        </span>
+        <span class="card__name">osu!</span>
+        <span class="card__desc">#39388621</span>
         <span class="card__go" aria-hidden="true">↗</span>
         <span class="card__shine" aria-hidden="true"></span>
       </a>
 
-      <a class="card" href="https://shikimori.one/SpirtoQ" target="_blank" rel="noopener"
-         data-tilt data-mag data-channel="shikimori" data-key="s" data-label="shikimori">
+      <!-- 04 · steam -->
+      <a class="card" href="https://steamcommunity.com/id/spirtoq/" target="_blank" rel="noopener"
+         data-tilt data-mag data-channel="steam" data-key="s" data-label="steam профиль">
         <span class="card__no">04</span>
         <span class="card__ico" aria-hidden="true">
           <svg viewBox="0 0 24 24">
-            <path d="M12 2.5l2.1 6.2 6.2 2.1-6.2 2.1L12 19.1l-2.1-6.2L3.7 10.8l6.2-2.1L12 2.5z"/>
-            <path d="M18.6 16.4l.9 2.5 2.5.9-2.5.9-.9 2.5-.9-2.5-2.5-.9 2.5-.9.9-2.5z" opacity=".55"/>
+            <circle cx="15.8" cy="8.2" r="5.7"/>
+            <circle cx="8.6" cy="15.4" r="3.1"/>
+            <path d="M12.4 12.6 9.6 14.2"/>
+            <path d="M15.8 2.5v1.6M21.5 8.2h-1.6M15.8 13.9v-1.5M10 8.2h1.5"/>
           </svg>
         </span>
-        <span class="card__name">shikimori</span>
-        <span class="card__desc">media archive</span>
+        <span class="card__name">steam</span>
+        <span class="card__desc">@spirtoq</span>
         <span class="card__go" aria-hidden="true">↗</span>
         <span class="card__shine" aria-hidden="true"></span>
       </a>
     </div>
+
+    <p class="cards__hint">клавиши <b>T</b> · <b>D</b> · <b>O</b> · <b>S</b>, пока карточки на экране</p>
   </section>
 
   <!-- ═══════════ 03 · SHELL / terminal ═══════════ -->
@@ -331,6 +364,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- ═══════════ SCRIPTS ═══════════ -->
 <script src="js/gl.js" defer></script>
 <script src="js/audio.js" defer></script>
+<script src="js/radio.js" defer></script>
 <script src="js/terminal.js" defer></script>
 <script src="js/app.js" defer></script>
 
