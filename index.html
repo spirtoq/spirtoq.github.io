@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--
+  SomaFM отдаёт 403 на поток, если в Referer приходит github.io.
+  GitHub Pages живёт на *.github.io, поэтому браузер шлёт
+  Referer: https://spirtoq.github.io/ — и станция не играет.
+  Ссылка на нас тут не нужна: счётчик идёт через sendBeacon, ему Referer
+  не требуется. Политика обязана быть в <head> meta: выставленная из JS
+  document.referrerPolicy на загрузку медиа не действует (проверено).
+-->
+<meta name="referrer" content="no-referrer">
 <title>SPIRTOQ // NULL SECTOR</title>
 
 <meta name="description" content="Personal transmission node of Spirtoq. Deep web frequency, live telemetry, ambient now-playing and an interactive terminal.">

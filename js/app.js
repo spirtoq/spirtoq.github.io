@@ -243,24 +243,44 @@
   }
 
   /* ═══════════ 09 · goatcounter ═══════════ */
+  /* Показ числа идёт через TOTAL.json — он отдаёт access-control-allow-origin:*,
+     то есть дело не в CORS. Firefox при недоступности хоста пишет
+     «код состояния: (null)» — соединение не установилось вовсе.
+     Пробуем дважды: мигающий прочерк из-за одного сбоя сети хуже лишнего
+     запроса. Само считание идёт через sendBeacon и Referer не требует. */
   function visits() {
     var el = $('#visits');
     if (!el) return;
     var done = false;
-    var to = setTimeout(function () { if (!done) { el.textContent = '—'; el.title = 'счётчик недоступен'; } }, 7000);
-    fetch('https://spirtoq.goatcounter.com/counter/TOTAL.json')
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        done = true; clearTimeout(to);
-        S.visits = d.count || '0';
-        el.textContent = S.visits;
-        countUp(el, S.visits);
-      })
-      .catch(function () {
-        clearTimeout(to);
+    var URL_CNT = 'https://spirtoq.goatcounter.com/counter/TOTAL.json';
+
+    function attempt(left) {
+      if (done) return;
+      var settled = false;
+      var to;
+      function show(n) {
+        if (settled) return; settled = true; clearTimeout(to);
+        if (done) return; done = true;
+        S.visits = n;
+        el.title = '';
+        el.textContent = n;
+        countUp(el, n);
+      }
+      function fail() {
+        if (settled) return; settled = true; clearTimeout(to);
+        if (done) return;
+        if (left > 0) { setTimeout(function () { attempt(left - 1); }, 1200); return; }
+        done = true;
         el.textContent = '—';
-        el.title = 'счётчик недоступен (CORS/offline)';
-      });
+        el.title = 'счётчик goatcounter недоступен из этой сети';
+      }
+      to = setTimeout(fail, 4500);
+      fetch(URL_CNT, { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+        .then(function (d) { show(d.count || '0'); })
+        .catch(fail);
+    }
+    attempt(1);
   }
 
   function countUp(el, target) {
