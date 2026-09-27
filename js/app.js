@@ -319,11 +319,26 @@
     toast('sfx ' + (S.sfx ? 'on' : 'off'));
   }
 
-  /* ═══════════ 13 · avatar easter egg ═══════════ */
+  /* ═══════════ 13 · avatar easter egg ═══════════
+     Аватар реагирует на курсор: наклон в 3D, параллакс и усиление свечения
+     следуют за мышью, клик по картинке даёт глитч-толчок и волну от точки
+     нажатия. Клик мимо картинки (по фону) — закрыть. */
   function initEject() {
-    var box = $('#eject'), img = $('#ejectImg'), x = $('#ejectX'), t = $('#heroTitle');
-    if (!box || !t) return;
+    var box = $('#eject'), stage = $('#ejectStage'), img = $('#ejectImg'),
+        wave = $('#ejectWave'), cap = $('#ejectCap'),
+        x = $('#ejectX'), t = $('#heroTitle');
+    if (!box || !t || !stage) return;
+
     var loaded = false;
+    var raf = 0, tx = 0, ty = 0, cx = 0, cy = 0, spark = 0, line = 0;
+
+    var LINES = [
+      'SIGNAL ACQUIRED — наведи и кликни по картинке',
+      'ты всё ещё смотришь',
+      'аватар не умеет говорить, зато умеет наклоняться',
+      'каждый клик — маленький сбой',
+      'ок. хватит. ты нашёл'
+    ];
 
     function open() {
       if (!loaded) { img.src = 'avatar.gif'; loaded = true; }
@@ -331,18 +346,77 @@
       document.body.classList.add('is-locked');
       if (SPIRTOQ.gl && SPIRTOQ.gl.pulse) SPIRTOQ.gl.pulse();
       SPIRTOQ.audio.sfx.ok();
+      if (!RM && !raf) raf = requestAnimationFrame(tick);
     }
+
     function close() {
+      if (box.hidden) return;
       box.hidden = true;
       document.body.classList.remove('is-locked');
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
     }
+
+    /* единственное место, где пишется геометрия — только кастомные
+       переменные. Ни width/height/margin, иначе центр уедет. */
+    function tick() {
+      cx += (tx - cx) * 0.11;
+      cy += (ty - cy) * 0.11;
+      spark = Math.max(0, spark - 0.045);
+      var d = Math.min(1, Math.sqrt(cx * cx + cy * cy));
+      var g = Math.min(1, d * 0.75 + spark);
+      var s = stage.style;
+      s.setProperty('--px', (cx * -14).toFixed(2) + 'px');
+      s.setProperty('--py', (cy * -14).toFixed(2) + 'px');
+      s.setProperty('--rx', (-cy * 7 + Math.sin(++line / 46) * 0.7).toFixed(2) + 'deg');
+      s.setProperty('--ry', (cx * 10 + Math.cos(line / 39) * 0.9).toFixed(2) + 'deg');
+      s.setProperty('--sc', (1 + g * 0.03).toFixed(4));
+      s.setProperty('--gl', g.toFixed(3));
+      raf = requestAnimationFrame(tick);
+    }
+
+    addEventListener('pointermove', function (e) {
+      if (box.hidden) return;
+      tx = (e.clientX / innerWidth  - 0.5) * 2;
+      ty = (e.clientY / innerHeight - 0.5) * 2;
+      if (!raf && !RM) raf = requestAnimationFrame(tick);
+    }, { passive: true });
+
+    addEventListener('resize', function () {
+      if (box.hidden) return;
+      cx = tx = 0; cy = ty = 0;
+    }, { passive: true });
+
+    function burst(clientX, clientY) {
+      spark = 1;
+      stage.classList.remove('jolt');
+      void stage.offsetWidth;                 /* перезапуск анимации */
+      stage.classList.add('jolt');
+      if (wave) {
+        var r = stage.getBoundingClientRect();
+        wave.style.left = (clientX - r.left) + 'px';
+        wave.style.top  = (clientY - r.top) + 'px';
+        wave.classList.remove('go');
+        void wave.offsetWidth;
+        wave.classList.add('go');
+      }
+      if (cap) cap.textContent = LINES[++line % LINES.length];
+      SPIRTOQ.audio.sfx.ok();
+      if (SPIRTOQ.gl && SPIRTOQ.gl.pulse) SPIRTOQ.gl.pulse();
+    }
+
+    stage.addEventListener('click', function (e) {
+      e.stopPropagation();
+      burst(e.clientX, e.clientY);
+    });
+
     t.addEventListener('click', function (e) { e.preventDefault(); open(); });
     t.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
     });
+
     box.addEventListener('click', close);
     if (x) x.addEventListener('click', function (e) { e.stopPropagation(); close(); });
-    addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) close(); });
+    addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
   }
 
   /* ═══════════ 14 · konami ═══════════ */

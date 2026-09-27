@@ -879,12 +879,72 @@ html.onair .stn.on .stn__bars i:nth-child(4){ animation-delay:.06s }
   animation:fadein .3s both; cursor:pointer;
 }
 .eject img{
-  max-width:min(560px, 84vw); max-height:66vh;
+  position:relative; z-index:2;
+  /* Квадрат задаётся заранее, независимо от загрузки: иначе до декодирования
+     гифа (1.9 МБ) пользователь видит пустую полосу в 2px. 66vh в min() —
+     чтобы аватар влезал по высоте на низких экранах. */
+  width:min(560px, 84vw, 66vh); aspect-ratio:1/1; height:auto; object-fit:contain;
   border:1px solid var(--a1);
-  box-shadow:0 0 60px color-mix(in srgb, var(--a1) 30%, transparent);
-  animation:pop .55s var(--ease) both;
+  display:block;
+  /* JS сюда пишет только --px/--py/--rx/--ry/--sc — наклон и параллакс.
+     Никаких width/height/margin: иначе центр снова уедет, как в курсоре. */
+  transform:
+    translate3d(var(--px,0px), var(--py,0px), 0)
+    rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))
+    scale(var(--sc,1));
+  box-shadow:
+    0 0 calc(28px + 52px * var(--gl,0.2)) color-mix(in srgb, var(--a1) calc(24% + 26% * var(--gl,0.2)), transparent);
+  /* без fill-mode: анимация обязана отпустить transform, иначе inline
+     не применится и наклона не будет видно */
+  animation:pop .55s var(--ease);
 }
 @keyframes pop{ from{ transform:scale(.86) rotate(-2deg); opacity:0 } }
+
+/* стенд: перспектива, глитч-толчок при клике, скан-линии */
+.eject__stage{
+  position:relative; z-index:2;
+  display:grid; place-items:center;
+  perspective:900px;
+  transform-style:preserve-3d;
+  cursor:crosshair;
+}
+.eject__stage::after{
+  content:''; position:absolute; inset:-2px; z-index:3;
+  pointer-events:none; opacity:.5; mix-blend-mode:overlay;
+  background:repeating-linear-gradient(
+    180deg, rgba(255,255,255,.09) 0 1px, transparent 1px 3px);
+  animation:scan 7s linear infinite;
+}
+@keyframes scan{ from{ background-position:0 0 } to{ background-position:0 300px } }
+
+.eject__stage.jolt{ animation:jolt .34s steps(5) 1; }
+@keyframes jolt{
+  0%,100%{ transform:none }
+  18%{ transform:translate(-8px, 3px) skewX(-5deg) }
+  38%{ transform:translate( 7px,-4px) skewX( 4deg) }
+  58%{ transform:translate(-5px,-2px) skewX(-3deg) }
+  78%{ transform:translate( 3px, 1px) }
+}
+.eject__stage.jolt img{ animation:chrom .34s linear 1; }
+@keyframes chrom{
+  0%,100%{ filter:none }
+  22%{ filter:hue-rotate(95deg) saturate(2.1) contrast(1.25) }
+  55%{ filter:hue-rotate(-55deg) saturate(1.7) contrast(1.15) }
+  80%{ filter:hue-rotate(20deg) saturate(1.2) }
+}
+
+/* волна от точки клика */
+.eject__wave{
+  position:absolute; z-index:4; left:0; top:0;
+  width:24px; height:24px; margin:-12px 0 0 -12px;
+  border:1px solid var(--a2); border-radius:50%;
+  pointer-events:none; opacity:0;
+}
+.eject__wave.go{ animation:wave .62s var(--ease-io) 1; }
+@keyframes wave{
+  from{ transform:scale(0);   opacity:.95 }
+  to  { transform:scale(26); opacity:0 }
+}
 .eject__cap{
   font:500 9.5px/1 var(--mono); letter-spacing:.26em; text-transform:uppercase;
   color:var(--a1); text-align:center; padding:0 20px;

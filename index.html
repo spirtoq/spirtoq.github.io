@@ -357,8 +357,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- ═══════════ OVERLAYS ═══════════ -->
 <div class="eject" id="eject" hidden>
   <button class="eject__x" id="ejectX" type="button" aria-label="закрыть">✕</button>
-  <img id="ejectImg" alt="avatar" decoding="async">
-  <span class="eject__cap">SIGNAL ACQUIRED — click anywhere to dismiss</span>
+  <div class="eject__stage" id="ejectStage">
+    <i class="eject__wave" id="ejectWave"></i>
+    <img id="ejectImg" alt="avatar" decoding="async">
+  </div>
+  <span class="eject__cap" id="ejectCap">SIGNAL ACQUIRED — наведи и кликни по картинке</span>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
