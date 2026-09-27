@@ -260,7 +260,7 @@
       silentFor = silent ? silentFor + 1 : 0;
       if (silentFor > 40) {           /* ~0.7s of nothing */
         checked = true; analyserOk = false;
-        if (el.hint) el.hint.textContent = 'визуализатор недоступен · звук идёт напрямую';
+        if (el.hint) el.hint.textContent = 'спектрограмма недоступна · звук идёт напрямую';
         unroute();
       } else if (!silent) { checked = true; analyserOk = true; }
     }

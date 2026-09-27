@@ -29,6 +29,21 @@
     '          ◆'
   ].join('\n');
 
+  /* Реальная машина, на которой это всё живёт. Снято с неё же:
+     `fastfetch` на CachyOS, октябрь 2026. Не выдумано. */
+  var MACHINE = {
+    os:     'CachyOS x86_64 (rolling)',
+    board:  'B550M AORUS ELITE',
+    kernel: 'Linux 7.2.7-1-cachyos',
+    shell:  'zsh 5.9.2',
+    wm:     'Hyprland 0.56.2 · Wayland',
+    cpu:    'AMD Ryzen 5 5600 · 6 ядер / 12 потоков @ 4.47 ГГц',
+    gpu:    'AMD Radeon RX 7600',
+    ram:    '31.3 GiB',
+    disk:   '932 ГБ · 46% занято',
+    tools:  'LMMS · Ren’Py · osu!lazer · LM Studio'
+  };
+
   function esc(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -77,67 +92,67 @@
       html(c('доступные команды', 'hi'));
       write('');
       var rows = [
-        ['help, ?',       'этот список'],
-        ['neofetch',      'сводка по системе'],
-        ['whoami',        'кто ты'],
-        ['ls / dir',      'содержимое ноды'],
-        ['cat <file>',    'прочитать файл'],
-        ['links',         'открытые каналы'],
-        ['now / np',      'что в эфире прямо сейчас'],
-        ['fm / radio',    'станции: fm 2 · fm dronezone'],
-        ['nick',          'скопировать ник discord'],
-        ['play <url>',    'проверить любой URL'],
-        ['ping',          'задержка до шлюза'],
-        ['time / date',   'локальное время'],
-        ['uptime',        'аптайм сессии'],
-        ['theme [name]',  'сменить палитру'],
-        ['sfx on|off',    'звук интерфейса'],
-        ['matrix',        'дождь матриц'],
-        ['god / konami',  'режим бога'],
-        ['banner',        'логотип'],
-        ['sudo <x>',      'попробуй угадать'],
-        ['curl <x>',      'ясно'],
-        ['history',       'история команд'],
-        ['clear / cls',   'очистить экран']
+        ['help, ?',      'этот список'],
+        ['fastfetch',    'железо и софт на машине SPIRTOQ'],
+        ['ls, dir',      'файлы ноды'],
+        ['cat <файл>',   'прочитать файл'],
+        ['links',        'каналы связи'],
+        ['nick',         'скопировать ник для Discord'],
+        ['now, np',      'что сейчас в эфире'],
+        ['fm, radio',    'радио: fm 2 · fm dronezone'],
+        ['theme [имя]',  'сменить тему'],
+        ['sfx on|off',   'звук интерфейса'],
+        ['matrix',       'дождь матриц'],
+        ['god, konami',  'режим бога'],
+        ['history',      'история команд'],
+        ['clear, cls',   'очистить экран']
       ];
       var s = '<table>';
       rows.forEach(function (r) { s += '<tr><td>' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td></tr>'; });
       html(s + '</table>');
       write('');
-      write('подсказка: команды чувствительны к регистру не на 100% · ESC — очистить ввод', 'dim');
+      write('имена команд нечувствительны к регистру · ↑↓ — история · Tab — дополнение', 'dim');
     },
 
-    neofetch: function () {
+    fastfetch: function () {
       var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-      var L = (s, cl) => '<span class="tl--' + (cl || 'out') + '">' + esc(s) + '</span>';
-      var left = EMBLEM.split('\n').map(function (l) { return pad(l, 17); }).join('\n');
+      var M = MACHINE;
+      var L = function (s, cl) { return '<span class="tl--' + (cl || 'out') + '">' + esc(s) + '</span>'; };
+      var KEY = function (n, w) { return L(pad(n, w), 'hi'); };
 
-      var info = [
-        L('spirtoq@null-sector', 'ok'),
-        L('─────────────────────', 'dim'),
-        L('OS', 'hi') + L('        ' + (k.os || 'web') + ' / ' + (k.browser || '?'), 'out'),
-        L('HOST', 'hi') + L('     ' + (k.host || 'github-pages'), 'out'),
-        L('KERNEL', 'hi') + L('  ' + (k.kernel || 'js/' + (k.engine || '?')), 'out'),
-        L('UPTIME', 'hi') + L('  ' + (k.uptime || '?'), 'out'),
-        L('SHELL', 'hi') + L('   nullsh 3.0', 'out'),
-        L('THEME', 'hi') + L('   ' + (k.theme || 'cyan'), 'out'),
-        L('CPU', 'hi') + L('      ' + (k.cores || '?') + ' threads @ ' + (k.mem || '?'), 'out'),
-        L('GPU', 'hi') + L('      ' + (k.gpu || 'webgl2'), 'out'),
-        L('RES', 'hi') + L('      ' + (k.res || '?'), 'out'),
-        L('LOCALE', 'hi') + L('  ' + (k.tz || '?'), 'out'),
-        L('NET', 'hi') + L('      ' + (k.net || '?'), 'out'),
-        L('VISITS', 'hi') + L('   ' + (k.visits || '?'), 'out')
-      ].join('\n');
+      var rows = [
+        ['spirtoq@null-sector', null, 'ok'],
+        ['─────────────────────', null, 'dim'],
+        ['OS',        M.os,     'out'],
+        ['BOARD',     M.board,  'out'],
+        ['KERNEL',    M.kernel, 'out'],
+        ['SHELL',     M.shell,  'out'],
+        ['WM',        M.wm,     'out'],
+        ['CPU',       M.cpu,    'out'],
+        ['GPU',       M.gpu,    'out'],
+        ['RAM',       M.ram,    'out'],
+        ['DISK',      M.disk,   'out'],
+        ['TOOLS',     M.tools,  'out'],
+        [null,        null,     null],
+        ['ТВОЁ ОКНО', k.res || '?', 'dim'],
+        ['СЕССИЯ',    k.uptime ? k.uptime + ' на сайте' : 'только что', 'dim'],
+        ['ТЕМА',      k.theme || 'cyan', 'dim']
+      ];
 
-      var art = left.split('\n'), dat = info.split('\n');
-      var n = Math.max(art.length, dat.length);
+      var dat = rows.map(function (r) {
+        if (!r[0]) return L('', 'dim');
+        return r[1] === null ? L(r[0], r[2]) : KEY(r[0], 10) + L(r[1], r[2]);
+      }).join('\n');
+
+      var art = EMBLEM.split('\n'), lines = dat.split('\n');
+      var n = Math.max(art.length, lines.length);
       var buf = '';
       for (var i = 0; i < n; i++) {
-        buf += '<span class="tl--ok">' + esc(art[i] || '') + '</span>  ' + (dat[i] || '') + '\n';
+        buf += '<span class="tl--ok">' + esc(pad(art[i] || '', 17)) + '</span>  ' +
+               (lines[i] || '') + '\n';
       }
       buf += '<span class="tl--ok">' + esc(pad('◆', 17)) + '</span>  ' +
-             '<span class="tl--dim">' + esc(pad(EMBLEM.split('\n')[6], 17)) + '</span>  ' +
-             '<span class="tl--out">хост открыт. будь аккуратен.</span>';
+             L('это не твой компьютер. это комп SPIRTOQ.', 'dim');
       html(buf);
       var swatches = ['--a1', '--a2', '--a3', '--a2', '--a1'];
       var sw = '<div style="height:9px;display:flex;gap:2px;margin:8px 0 4px">';
@@ -145,14 +160,9 @@
         sw += '<i style="flex:1;background:var(' + v + ');box-shadow:0 0 10px var(' + v + ')"></i>';
       });
       html(sw + '</div>');
+      SPIRTOQ.audio.sfx.ok();
     },
-
-    whoami: function () {
-      var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-      write('guest@null-sector — аутентификация не требуется.', 'out');
-      write('ты — это то, что читает эти строки. и ты же нажал Enter.', 'dim');
-      write('владелец ноды: SPIRTOQ · ' + (k.uptime || '?') + ' сессии', 'ok');
-    },
+    neofetch: function () { CMDS.fastfetch(); },
 
     ls: function () {
       var files = [
@@ -179,10 +189,10 @@
       var files = {
         'about.txt': function () {
           write('SPIRTOQ — человек из глубины веба.', 'out');
-          write('Собираю частоты, слушаю музыку и иногда пишу шейдеры.', 'out');
+          write('Собираю частоты, слушаю музыку, иногда пишу шейдеры.', 'out');
           write('Эта страница — личный передатчик в пустоту. Она живая:', 'dim');
           write('  · фон рисуется шейдером в реальном времени', 'ok');
-          write('  · радио играет прямо в браузере, 4 станции', 'ok');
+          write('  · радио играет в браузере, четыре станции на выбор', 'ok');
           write('  · счётчик считает, сколько нас тут было', 'ok');
         },
         'boot.log': function () {
@@ -203,23 +213,23 @@
           write('cat secrets/one · two · three', 'ok');
         },
         'secrets/one': function () {
-          write('ты кликнул по слову SPIRTOQ. и закрыл. и открыл снова.', 'out');
-          write('а потом набрал matrix, потом god.', 'ok');
+          write('ты кликнул по слову SPIRTOQ, потом закрыл окно и открыл снова.', 'out');
+          write('а потом набрал matrix, а потом god.', 'ok');
           write('у каждого есть своя комбинация. у тебя тоже будет.', 'dim');
         },
         'secrets/two': function () {
-          write('если ты это читаешь — значит рендер не упал.', 'out');
+          write('если ты это читаешь, значит, рендер не упал.', 'out');
           write('fps считается в консоли. там тихо.', 'dim');
         },
         'secrets/three': function () {
           write('радио тянется с soma.fm по прямой ссылке, без ключа.', 'out');
-          write('и визуализатор честный: если поток не даёт звук — он это скажет.', 'ok');
-          write('если ты читаешь это, ты уже видел консоль. ты один из тех.', 'dim');
+          write('спектрограмма честная: если поток не отдаёт звук, она об этом скажет.', 'ok');
+          write('если ты это читаешь, значит, ты уже заглянул в консоль. ты один из тех.', 'dim');
         },
         'index.html': function () {
-          write('11 350 байт. весь сайт в одном файле.', 'out');
-          write('старая версия. новая разбита на файлы.', 'dim');
-          write('grep -r "EXTRACT_ALL" .', 'ok');
+          write('17 КБ. разметка, стили и пять скриптов.', 'out');
+          write('раньше всё лежало в одном файле. так было неудобно.', 'dim');
+          write('cat about.txt — начни отсюда', 'ok');
         },
         'signal.log': function () {
           var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
@@ -255,13 +265,13 @@
     nick: function () {
       var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
       var d = (k.links || []).filter(function (l) { return l.copy; })[0];
-      if (!d) { write('ника нет', 'err'); return; }
-      write('ник в discord: ' + d.copy, 'ok');
+      if (!d) { write('канала для копирования нет', 'err'); return; }
+      write('ник в Discord: ' + d.copy, 'ok');
       if (SPIRTOQctx.copyNick) {
         SPIRTOQctx.copyNick(d);
-        write('скопировано. вставь в поиск людей в дискорде.', 'dim');
+        write('скопировано — вставь в поиск пользователей Discord.', 'dim');
       } else {
-        write('скопируй вручную — ' + d.copy, 'dim');
+        write('скопируй вручную: ' + d.copy, 'dim');
       }
     },
 
@@ -274,7 +284,7 @@
       write('  ' + (r.title || 'тишина в эфире'), r.title ? 'out' : 'dim');
       if (r.artist) write('  ' + r.artist, 'out');
       if (r.album) write('  ' + r.album, 'dim');
-      write('  визуализатор: ' + (r.analyser === 'live' ? 'реагирует на звук' : 'декоративный'),
+      write('  спектрограмма: ' + (r.analyser === 'live' ? 'реагирует на звук' : 'нарисована вручную'),
             r.analyser === 'live' ? 'hi' : 'dim');
     },
     np: function () { CMDS.now(); },
@@ -288,8 +298,8 @@
         st.forEach(function (s, i) {
           write('  ' + pad(i + 1, 3) + s.id.padEnd(14) + pad(s.name, 16) + s.tag, 'out');
         });
-        write(' fm <n|name> — переключить и включить', 'dim');
-        write(' fm stop / fm play', 'dim');
+        write(' fm <номер|имя> — переключить и включить', 'dim');
+        write(' fm play · fm stop', 'dim');
         return;
       }
       var a = String(arg).toLowerCase();
@@ -303,66 +313,42 @@
       write('→ ' + st[idx].name + ' · ' + st[idx].tag, 'ok');
     },
     fm: function (a) { CMDS.radio(a); },
-    stations: function () { CMDS.radio(''); },
-
-    play: function (arg) {
-      if (!arg) { write('play: укажи url', 'err'); return; }
-      var u = /^https?:\/\//i.test(arg) ? arg : 'https://' + arg;
-      write('проверяю ' + u + ' …', 'dim');
-      setTimeout(function () {
-        write('очевидно я ничего не открою из браузера.', 'out');
-        write('но адрес выглядит правдоподобно. скопируй руками.', 'dim');
-        SPIRTOQ.audio.sfx.ok();
-      }, 620);
-    },
-
-    ping: function () {
-      var t0 = performance.now();
-      fetch(location.href, { method: 'HEAD', cache: 'no-store' })
-        .catch(function () {})
-        .then(function () {
-          var ms = Math.max(1, Math.round(performance.now() - t0));
-          write('64 bytes from null-sector: icmp_seq=0 ttl=54 time=' + ms + 'ms', 'ok');
-          if (ms > 600) write('заметно медленно. где-то сервер устал.', 'dim');
-        });
-    },
-
-    time: function () {
-      var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-      write(k.time || '--:--:--', 'ok');
-      write(k.date || '', 'dim');
-      write('зона: ' + (k.tz || '?') + ' · смещение ' + (k.tzoff || '?'), 'dim');
-    },
-    date: function () { CMDS.time(); },
-
-    uptime: function () {
-      var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-      write('up ' + (k.uptime || '?') + ' · сессия ' + (k.sessions || '?'), 'ok');
-      write(k.res || '', 'dim');
-    },
 
     theme: function (arg) {
       var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
       var names = k.themes || ['cyan', 'amber', 'matrix', 'void', 'blood'];
-      if (!arg) {
-        write('доступные темы: ' + names.join(' · '), 'out');
-        write('текущая: ' + (k.theme || 'cyan') + '  ·  без аргумента — следующая по кругу', 'dim');
+      var cur = String(k.theme || 'cyan').toLowerCase();
+      if (!arg) {                              /* без аргумента — по кругу */
+        var at = names.indexOf(cur);
+        var next = names[(at + 1 + names.length) % names.length];
+        SPIRTOQctx.setTheme(next);
+        write('тема → ' + next, 'ok');
+        write('все темы: ' + names.join(' · '), 'dim');
+        SPIRTOQ.audio.sfx.ok();
         return;
       }
       var n = String(arg).toLowerCase();
-      if (names.indexOf(n) === -1) { write('theme: нет темы "' + n + '"', 'err'); SPIRTOQ.audio.sfx.err(); return; }
+      if (names.indexOf(n) === -1) { write('нет темы «' + n + '»', 'err'); SPIRTOQ.audio.sfx.err(); return; }
       SPIRTOQctx.setTheme(n);
-      write('палитра → ' + n, 'ok');
+      write('тема → ' + n, 'ok');
       SPIRTOQ.audio.sfx.ok();
     },
 
     sfx: function (arg) {
-      var on = arg === 'on' || arg === '1';
-      var off = arg === 'off' || arg === '0';
-      if (!arg) { write('sfx: ' + (SPIRTOQ.audio.isOn() ? 'on' : 'off') + ' · переключить: sfx on|off', 'out'); return; }
-      if (on && !SPIRTOQ.audio.isOn()) { SPIRTOQ.audio.enable(); write('звук включён', 'ok'); }
-      else if (off) { SPIRTOQ.audio.disable(); write('звук выключен', 'dim'); }
-      else { write('sfx: используй on или off', 'err'); return; }
+      if (!arg) {
+        write('звук: ' + (SPIRTOQ.audio.isOn() ? 'включён' : 'выключен') + ' · переключить: sfx on|off', 'out');
+        return;
+      }
+      var a = String(arg).toLowerCase();
+      if (a !== 'on' && a !== 'off' && a !== '1' && a !== '0') {
+        write('sfx: нужно on или off', 'err');
+        SPIRTOQ.audio.sfx.err();
+        return;
+      }
+      if (a === 'on' || a === '1') SPIRTOQ.audio.enable();
+      else SPIRTOQ.audio.disable();
+      var now = SPIRTOQ.audio.isOn();
+      write('звук ' + (now ? 'включён' : 'выключен'), now ? 'ok' : 'dim');
       if (SPIRTOQctx.syncUI) SPIRTOQctx.syncUI();
     },
 
@@ -374,79 +360,23 @@
 
     god: function () {
       var on = SPIRTOQctx.toggleGod ? SPIRTOQctx.toggleGod() : false;
-      write(on ? 'GOD MODE ENGAGED — решётка в шоке' : 'godot mode выключен', on ? 'ok' : 'dim');
+      write(on ? 'GOD MODE — решётка дрожит' : 'режим бога выключен', on ? 'ok' : 'dim');
       SPIRTOQ.audio.sfx.ok();
     },
     konami: function () { CMDS.god(); },
-
-    banner: function () { banner(); },
-
-    cowsay: function (arg) {
-      var t = arg || 'мы всё ещё на частоте';
-      var top = ' ' + '─'.repeat(t.length + 2) + ' ';
-      write(' ' + top);
-      write('< ' + t + ' >', 'ok');
-      write(' ' + '─'.repeat(t.length + 2));
-      var r = '          \\   ^__^';
-      write('           \\  (oo)\\_______');
-      write('              (__)\\       )\\/\\');
-      write('                  ||----w |');
-      write('                  ||     ||', 'dim');
-    },
-
-    sudo: function (arg) {
-      if (!arg) { write('usage: sudo <команда>', 'err'); return; }
-      write('пользователь spirtoq не в списке sudoers.', 'err');
-      write('впрочем, если серьёзно — ты и так уже root этой страницы.', 'out');
-      SPIRTOQ.audio.sfx.err();
-    },
-
-    curl: function (arg) {
-      if (!arg) { write('curl: укажи url', 'err'); return; }
-      write('$ curl ' + arg, 'dim');
-      write('ничего не выведет. это же браузер.', 'out');
-      write('но адрес запомнил.', 'dim');
-    },
 
     history: function () {
       if (!history.length) { write('история пуста', 'dim'); return; }
       history.forEach(function (h, i) { write(pad(i + 1, 4) + h, 'dim'); });
     },
 
-    man: function (arg) {
-      if (!arg) { write('man: что читаем?', 'err'); return; }
-      var c2 = CMDS[String(arg).toLowerCase()];
-      if (!c2) { write('no manual entry for ' + arg, 'err'); return; }
-      write('это интерактивная команда, а не man page.', 'out');
-      write('просто набери: ' + arg, 'ok');
-    },
-
-    grep: function (arg) {
-      if (!arg) { write('grep: нужен паттерн', 'err'); return; }
-      write('Searching ' + arg + ' ...', 'dim');
-      var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-      var hay = ['index.html', 'css/main.css', 'js/gl.js', 'js/audio.js', 'js/radio.js',
-                 'js/terminal.js', 'js/app.js']
-        .join('\n') + '\n' + ((k.radio && k.radio.artist) || '') + '\n' + ((k.radio && k.radio.title) || '');
-      var re = new RegExp(String(arg).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-      var hits = hay.split('\n').filter(function (l) { return re.test(l); });
-      if (!hits.length) { write('0 совпадений. чисто.', 'dim'); return; }
-      hits.forEach(function (l) { write(esc(l).replace(new RegExp('(' + re.source + ')', 'ig'), '<span class="tl--ok">$1</span>'), 'out'); });
-    },
-
     clear: function () { out.innerHTML = ''; },
-    cls: function () { CMDS.clear(); },
-    exit: function () {
-      write('выход не предусмотрен. ты в браузере, а не в ssh.', 'err');
-      input.focus();
-    }
+    cls: function () { CMDS.clear(); }
   };
 
   /* aliases */
   CMDS['?'] = CMDS.help;
   CMDS.dir = CMDS.ls;
-  CMDS['clear!'] = CMDS.clear;
-  CMDS.fetch = CMDS.play;
 
   /* ── run one command line ──────────────────────────────── */
   function run(raw) {
@@ -559,7 +489,7 @@
     write('');
     banner();
     write('');
-    write('последний вход: сегодня, с ' + (navigator.language || 'этого устройства'), 'dim');
+    write('последний вход: сегодня · язык браузера: ' + (navigator.language || 'не определён'), 'dim');
     SPIRTOQ.audio.sfx.ok();
   }
 

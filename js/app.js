@@ -74,17 +74,23 @@
     if (!wrap || !dot || !ring) return;
     var x = innerWidth / 2, y = innerHeight / 2, rx = x, ry = y, raf = 0;
 
+    /* only ever writes a translate — centring and sizing belong to CSS */
+    function place(el, px, py) {
+      el.style.transform = 'translate3d(' + px + 'px,' + py + 'px,0)';
+    }
+
     addEventListener('pointermove', function (e) {
       x = e.clientX; y = e.clientY;
-      dot.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      place(dot, x, y);
       if (!raf) raf = requestAnimationFrame(follow);
     }, { passive: true });
 
     function follow() {
-      rx += (x - rx) * 0.16; ry += (y - ry) * 0.16;
-      ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px)';
-      raf = (Math.abs(x - rx) + Math.abs(y - ry) > 0.4) ? requestAnimationFrame(follow) : 0;
+      rx += (x - rx) * 0.22; ry += (y - ry) * 0.22;
+      place(ring, rx, ry);
+      raf = (Math.abs(x - rx) + Math.abs(y - ry) > 0.15) ? requestAnimationFrame(follow) : 0;
     }
+    place(dot, x, y); place(ring, rx, ry);
 
     doc.addEventListener('pointerover', function (e) {
       var hot = e.target.closest && e.target.closest('[data-mag],a,button,input,.card');
@@ -94,9 +100,13 @@
       }
     }, { passive: true });
 
-    doc.addEventListener('pointerdown', function () { ring.style.scale = '.82'; }, { passive: true });
-    doc.addEventListener('pointerup', function () { ring.style.scale = ''; }, { passive: true });
-    addEventListener('blur', function () { root.classList.remove('cur-hot'); });
+    doc.addEventListener('pointerdown', function () { wrap.classList.add('is-press'); }, { passive: true });
+    doc.addEventListener('pointerup', function () { wrap.classList.remove('is-press'); }, { passive: true });
+    doc.addEventListener('pointercancel', function () { wrap.classList.remove('is-press'); }, { passive: true });
+    addEventListener('blur', function () {
+      root.classList.remove('cur-hot');
+      wrap.classList.remove('is-press');
+    });
     setTimeout(function () { root.classList.add('has-cursor'); }, 1200);
   })();
 

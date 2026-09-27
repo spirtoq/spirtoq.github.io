@@ -164,34 +164,51 @@ html.gl-ready #gl{ opacity:1; }
   80%{transform:translate(4%,2%)}   100%{transform:translate(0,0)}
 }
 
-/* cursor */
+/* cursor
+   The wrappers (.cur__dot, .cur__ring) are zero-size boxes whose only job is to
+   carry a translate. Everything with a dimension lives on a child, and sizing
+   happens with the standalone `scale` property — never with width/height/margin.
+   Scaling a child about its own centre, where that centre sits exactly on the
+   pointer, is the only way to guarantee the ring can't drift off the dot. */
 .cur{ position:fixed; top:0; left:0; z-index:9998; pointer-events:none; opacity:0;
       transition:opacity .4s var(--ease); }
 html.has-cursor .cur{ opacity:1; }
 html.has-cursor, html.has-cursor *{ cursor:none !important; }
-.cur__dot{
-  position:absolute; width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%;
+
+.cur__dot, .cur__ring{
+  position:absolute; top:0; left:0; width:0; height:0;
+  will-change:transform; contain:layout style;
+}
+.cur__dot::before{
+  content:''; position:absolute; left:-3px; top:-3px;
+  width:6px; height:6px; border-radius:50%;
   background:var(--a1); box-shadow:0 0 8px var(--a1), 0 0 20px var(--a1);
+  transition:scale .28s var(--ease);
 }
-.cur__ring{
-  position:absolute; width:34px; height:34px; margin:-17px 0 0 -17px; border-radius:50%;
+html.cur-hot .cur__dot::before{ scale:.4; }
+
+.cur__disc{
+  position:absolute; left:-17px; top:-17px;
+  width:34px; height:34px; border-radius:50%;
   border:1px solid color-mix(in srgb, var(--a1) 45%, transparent);
-  transition: width .3s var(--ease), height .3s var(--ease), margin .3s var(--ease),
-              border-color .3s var(--ease), background .3s var(--ease);
+  background:transparent;
+  transition:scale .28s var(--ease), border-color .28s var(--ease),
+             background .28s var(--ease);
 }
-.cur__label{
-  position:absolute; left:22px; top:8px; white-space:nowrap;
-  font:500 9px/1 var(--mono); letter-spacing:.22em; text-transform:uppercase;
-  color:var(--a1); opacity:0; transform:translateY(4px);
-  transition:opacity .25s var(--ease), transform .25s var(--ease);
-}
-html.cur-hot .cur__ring{
-  width:62px; height:62px; margin:-31px 0 0 -31px;
+html.cur-hot .cur__disc{
+  scale:1.82;
   background:color-mix(in srgb, var(--a1) 9%, transparent);
   border-color:var(--a1);
 }
-html.cur-hot .cur__label{ opacity:1; transform:none; }
-html.cur-hot .cur__dot{ transform:scale(.4); }
+.cur.is-press .cur__disc{ scale:1.5; }
+
+.cur__label{
+  position:absolute; left:24px; top:-5px; white-space:nowrap;
+  font:500 9px/1 var(--mono); letter-spacing:.22em; text-transform:uppercase;
+  color:var(--a1); opacity:0; transform:translateY(4px);
+  transition:opacity .25s var(--ease), transform .25s var(--ease), left .28s var(--ease);
+}
+html.cur-hot .cur__label{ opacity:1; transform:none; left:36px; }
 
 /* ═════════ 03 · BOOT ═════════ */
 .boot{
