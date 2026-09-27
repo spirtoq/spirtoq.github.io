@@ -432,7 +432,7 @@
         if (i === K.length) {
           i = 0;
           setGod(!S.god);
-          SPIRTOQ.term.run('god');
+          toggleGod();
           SPIRTOQ.term.focus();
           toast('↑↑↓↓←→←→BA — ' + (S.god ? 'god mode on' : 'god mode off'), 3200);
         }
@@ -513,6 +513,15 @@
   function initKeys() {
     var uplink = doc.getElementById('uplink');
 
+    /* Пока в кадре карточки связи, глобальные буквы выключены.
+       Иначе «c» на карточке меняет тему, «m» включает дождь, «v» — звук:
+       жмёшь на карточку, а страница дёргается в ответ. */
+    function cardsUp() {
+      if (!uplink) return false;
+      var r = uplink.getBoundingClientRect();
+      return r.top < innerHeight * 0.6 && r.bottom > innerHeight * 0.4;
+    }
+
     addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       var t = e.target;
@@ -522,23 +531,18 @@
 
       var k = e.key.toLowerCase();
 
-      /* link hotkeys only arm themselves while the uplink cards are on screen */
-      if (uplink) {
-        var r = uplink.getBoundingClientRect();
-        var visible = r.top < innerHeight * 0.6 && r.bottom > innerHeight * 0.4;
-        if (visible) {
+      /* на карточках живут только их собственные хоткеи */
+      if (cardsUp()) {
+        if (e.key.length === 1) {
           var L = LINKS.filter(function (l) { return l.key === e.key.toUpperCase(); })[0];
-          if (L && e.key.length === 1) {
-            e.preventDefault();
-            activate(L);
-            return;
-          }
+          if (L) { e.preventDefault(); activate(L); }
         }
+        return;
       }
 
       switch (k) {
-        case 'm': SPIRTOQ.term.run('matrix'); SPIRTOQ.term.focus(); break;
-        case 'g': SPIRTOQ.term.run('god'); SPIRTOQ.term.focus(); break;
+        case 'm': SPIRTOQ.rain.toggle(); toast('дождь матриц'); break;
+        case 'g': toggleGod(); break;
         case 'v': toggleSfx(); break;
         case 'c': nextTheme(); break;
         case 'f': toggleFull(); break;

@@ -92,26 +92,16 @@
       html(c('доступные команды', 'hi'));
       write('');
       var rows = [
-        ['help, ?',      'этот список'],
-        ['fastfetch',    'железо и софт на машине SPIRTOQ'],
-        ['ls, dir',      'файлы ноды'],
-        ['cat <файл>',   'прочитать файл'],
-        ['links',        'каналы связи'],
-        ['nick',         'скопировать ник для Discord'],
-        ['now, np',      'что сейчас в эфире'],
-        ['fm, radio',    'радио: fm 2 · fm dronezone'],
-        ['theme [имя]',  'сменить тему'],
-        ['sfx on|off',   'звук интерфейса'],
-        ['matrix',       'дождь матриц'],
-        ['god, konami',  'режим бога'],
-        ['history',      'история команд'],
-        ['clear, cls',   'очистить экран']
+        ['fastfetch',  'железо и софт на машине SPIRTOQ'],
+        ['links',      'каналы связи'],
+        ['help, ?',    'этот список'],
+        ['clear, cls', 'очистить экран']
       ];
       var s = '<table>';
       rows.forEach(function (r) { s += '<tr><td>' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td></tr>'; });
       html(s + '</table>');
       write('');
-      write('имена команд нечувствительны к регистру · ↑↓ — история · Tab — дополнение', 'dim');
+      write('имена команд нечувствительны к регистру · ↑↓ — история, Tab — дополнение', 'dim');
     },
 
     fastfetch: function () {
@@ -164,89 +154,6 @@
     },
     neofetch: function () { CMDS.fastfetch(); },
 
-    ls: function () {
-      var files = [
-        ['drwxr-xr-x', 'about.txt', 'dir'],
-        ['-rw-r--r--', 'boot.log', 'file'],
-        ['-rw-r--r--', 'index.html', 'file'],
-        ['drwxr-xr-x', 'secrets', 'dir'],
-        ['-rw-rw-rw-', 'signal.log', 'file'],
-        ['-rwxr-xr-x', 'nullsh', 'bin']
-      ];
-      var s = '<table>';
-      files.forEach(function (f) {
-        s += '<tr><td>' + esc(f[0]) + '</td><td>' + esc(f[1]) + '</td>' +
-             '<td class="tl--dim">' + (f[2] === 'dir' ? '→' : size(f[1])) + '</td></tr>';
-      });
-      html(s + '</table>');
-      write('cat about.txt — начни отсюда', 'dim');
-      function size(n) {
-        return ({ 'index.html': '11.4 KB', 'boot.log': '2.1 KB', 'signal.log': '4.7 KB' })[n] || '—';
-      }
-    },
-
-    cat: function (arg) {
-      var files = {
-        'about.txt': function () {
-          write('SPIRTOQ — человек из глубины веба.', 'out');
-          write('Собираю частоты, слушаю музыку, иногда пишу шейдеры.', 'out');
-          write('Эта страница — личный передатчик в пустоту. Она живая:', 'dim');
-          write('  · фон рисуется шейдером в реальном времени', 'ok');
-          write('  · радио играет в браузере, четыре станции на выбор', 'ok');
-          write('  · счётчик считает, сколько нас тут было', 'ok');
-        },
-        'boot.log': function () {
-          var lines = [
-            '00.000  POST .................. ok',
-            '00.104  mount /dev/shader2 .... ok',
-            '00.212  load font:Syncopate .... ok',
-            '00.488  mount /dev/icecast2 ... ok',
-            '00.771  negotiate uplink ...... ok',
-            '01.130  handshake ............. ok',
-            '01.402  <b>GOD MODE AVAILABLE</b>  (konami)',
-            '01.900  ready.'
-          ];
-          lines.forEach(function (l) { write(l.replace(/<b>|<\/b>/g, ''), 'dim'); });
-        },
-        'secrets': function () {
-          write('в этой папке 3 файла. все три открыты.', 'dim');
-          write('cat secrets/one · two · three', 'ok');
-        },
-        'secrets/one': function () {
-          write('ты кликнул по слову SPIRTOQ, потом закрыл окно и открыл снова.', 'out');
-          write('а потом набрал matrix, а потом god.', 'ok');
-          write('у каждого есть своя комбинация. у тебя тоже будет.', 'dim');
-        },
-        'secrets/two': function () {
-          write('если ты это читаешь, значит, рендер не упал.', 'out');
-          write('fps считается в консоли. там тихо.', 'dim');
-        },
-        'secrets/three': function () {
-          write('радио тянется с soma.fm по прямой ссылке, без ключа.', 'out');
-          write('спектрограмма честная: если поток не отдаёт звук, она об этом скажет.', 'ok');
-          write('если ты это читаешь, значит, ты уже заглянул в консоль. ты один из тех.', 'dim');
-        },
-        'index.html': function () {
-          write('17 КБ. разметка, стили и пять скриптов.', 'out');
-          write('раньше всё лежало в одном файле. так было неудобно.', 'dim');
-          write('cat about.txt — начни отсюда', 'ok');
-        },
-        'signal.log': function () {
-          var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-          var r = k.radio || {};
-          write('эфир:', 'dim');
-          write((r.title || 'тишина') + ' — ' + (r.artist || '?'), 'ok');
-          write('станция: ' + (r.station || '?') + ' · ' + (r.playing ? 'играет' : 'пауза'), 'out');
-          write('канал: ice2.somafm.com · метаданные somafm.com', 'dim');
-        }
-      };
-      var f = (arg || '').toLowerCase();
-      if (!f) { write('cat: нужно имя файла · ls покажет список', 'err'); SPIRTOQ.audio.sfx.err(); return; }
-      if (files[f]) { files[f](); return; }
-      write('cat: ' + f + ': нет такого файла', 'err');
-      SPIRTOQ.audio.sfx.err();
-    },
-
     links: function () {
       var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
       var L = k.links || [];
@@ -262,121 +169,12 @@
       write('горячие клавиши T · D · O · S работают, пока карточки на экране', 'dim');
     },
 
-    nick: function () {
-      var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-      var d = (k.links || []).filter(function (l) { return l.copy; })[0];
-      if (!d) { write('канала для копирования нет', 'err'); return; }
-      write('ник в Discord: ' + d.copy, 'ok');
-      if (SPIRTOQctx.copyNick) {
-        SPIRTOQctx.copyNick(d);
-        write('скопировано — вставь в поиск пользователей Discord.', 'dim');
-      } else {
-        write('скопируй вручную: ' + d.copy, 'dim');
-      }
-    },
-
-    now: function () {
-      var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-      var r = k.radio || {};
-      if (!r.station) { write('радио не инициализировано', 'err'); return; }
-      write((r.playing ? '▶ ' : '❚❚ ') + r.station + '  [' + (r.playing ? 'ON AIR' : 'STANDBY') + ']',
-            r.playing ? 'ok' : 'dim');
-      write('  ' + (r.title || 'тишина в эфире'), r.title ? 'out' : 'dim');
-      if (r.artist) write('  ' + r.artist, 'out');
-      if (r.album) write('  ' + r.album, 'dim');
-      write('  спектрограмма: ' + (r.analyser === 'live' ? 'реагирует на звук' : 'нарисована вручную'),
-            r.analyser === 'live' ? 'hi' : 'dim');
-    },
-    np: function () { CMDS.now(); },
-
-    radio: function (arg) {
-      var R = SPIRTOQ.radio;
-      if (!R) { write('радио недоступно', 'err'); return; }
-      var st = R.stations;
-      if (!arg) {
-        write('доступные станции (номер или имя):', 'hi');
-        st.forEach(function (s, i) {
-          write('  ' + pad(i + 1, 3) + s.id.padEnd(14) + pad(s.name, 16) + s.tag, 'out');
-        });
-        write(' fm <номер|имя> — переключить и включить', 'dim');
-        write(' fm play · fm stop', 'dim');
-        return;
-      }
-      var a = String(arg).toLowerCase();
-      if (a === 'stop' || a === 'off') { R.pause(); write('пауза', 'dim'); return; }
-      if (a === 'play' || a === 'on') { R.play(); write('воспроизведение', 'ok'); return; }
-
-      var idx = /^\d+$/.test(a) ? +a - 1
-              : st.map(function (s) { return s.id; }).indexOf(a);
-      if (idx < 0 || idx >= st.length) { write('fm: станция «' + arg + '» не найдена', 'err'); return; }
-      R.pick(idx);
-      write('→ ' + st[idx].name + ' · ' + st[idx].tag, 'ok');
-    },
-    fm: function (a) { CMDS.radio(a); },
-
-    theme: function (arg) {
-      var k = SPIRTOQctx.info ? SPIRTOQctx.info() : {};
-      var names = k.themes || ['cyan', 'amber', 'matrix', 'void', 'blood'];
-      var cur = String(k.theme || 'cyan').toLowerCase();
-      if (!arg) {                              /* без аргумента — по кругу */
-        var at = names.indexOf(cur);
-        var next = names[(at + 1 + names.length) % names.length];
-        SPIRTOQctx.setTheme(next);
-        write('тема → ' + next, 'ok');
-        write('все темы: ' + names.join(' · '), 'dim');
-        SPIRTOQ.audio.sfx.ok();
-        return;
-      }
-      var n = String(arg).toLowerCase();
-      if (names.indexOf(n) === -1) { write('нет темы «' + n + '»', 'err'); SPIRTOQ.audio.sfx.err(); return; }
-      SPIRTOQctx.setTheme(n);
-      write('тема → ' + n, 'ok');
-      SPIRTOQ.audio.sfx.ok();
-    },
-
-    sfx: function (arg) {
-      if (!arg) {
-        write('звук: ' + (SPIRTOQ.audio.isOn() ? 'включён' : 'выключен') + ' · переключить: sfx on|off', 'out');
-        return;
-      }
-      var a = String(arg).toLowerCase();
-      if (a !== 'on' && a !== 'off' && a !== '1' && a !== '0') {
-        write('sfx: нужно on или off', 'err');
-        SPIRTOQ.audio.sfx.err();
-        return;
-      }
-      if (a === 'on' || a === '1') SPIRTOQ.audio.enable();
-      else SPIRTOQ.audio.disable();
-      var now = SPIRTOQ.audio.isOn();
-      write('звук ' + (now ? 'включён' : 'выключен'), now ? 'ok' : 'dim');
-      if (SPIRTOQctx.syncUI) SPIRTOQctx.syncUI();
-    },
-
-    matrix: function () {
-      var on = SPIRTOQ.rain.toggle();
-      write(on ? 'дождь матриц включён. реальность подождёт.' : 'дождь матриц выключен', on ? 'ok' : 'dim');
-      SPIRTOQ.audio.sfx.ok();
-    },
-
-    god: function () {
-      var on = SPIRTOQctx.toggleGod ? SPIRTOQctx.toggleGod() : false;
-      write(on ? 'GOD MODE — решётка дрожит' : 'режим бога выключен', on ? 'ok' : 'dim');
-      SPIRTOQ.audio.sfx.ok();
-    },
-    konami: function () { CMDS.god(); },
-
-    history: function () {
-      if (!history.length) { write('история пуста', 'dim'); return; }
-      history.forEach(function (h, i) { write(pad(i + 1, 4) + h, 'dim'); });
-    },
-
     clear: function () { out.innerHTML = ''; },
     cls: function () { CMDS.clear(); }
   };
 
   /* aliases */
   CMDS['?'] = CMDS.help;
-  CMDS.dir = CMDS.ls;
 
   /* ── run one command line ──────────────────────────────── */
   function run(raw) {

@@ -19,13 +19,25 @@
   ];
 
   var BITRATE = 128;
-  var streamOf = function (id) { return 'https://ice2.somafm.com/' + id + '-' + BITRATE + '-mp3'; };
+  /* SomaFM раздаёт поток с нескольких зеркал. Если конкретное недоступно
+     из чьей-то сети, молча уходим на следующее, вместо того чтобы писать
+     пользователю «поток недоступен». */
+  var HOSTS = ['ice2', 'ice1', 'ice4', 'ice6'];
+  var hostIx = 0, tried = 0;
+
+  function streamOf(id) {
+    return 'https://' + HOSTS[hostIx] + '.somafm.com/' + id + '-' + BITRATE + '-mp3';
+  }
   var songsOf  = function (id) { return 'https://somafm.com/songs/' + id + '.json'; };
 
   /* ── state ─────────────────────────────────────────────── */
   var el = {};
   var audio = null, ctx = null, srcNode = null, analyser = null, freq = null;
-  var current = -1, playing = false, analyserOk = false, checked = false;
+  var current = -1, playing = false, analyserOk = false;
+  /* checked — «граф уже дал вердикт по текущей попытке». Раньше это была
+     защёлка на весь сеанс: одна тишина — и спектрограмма не восстанавливалась
+     ни на одной станции до перезагрузки страницы. */
+  var checked = false, liveSince = 0;
   var routed = false;
   var vol = 0.75, track = null, raf = 0, poll = 0, silentFor = 0;
   var peaks = [], contextInited = false;
@@ -96,13 +108,20 @@
     var was = playing, at = audio ? audio.currentTime : 0;
     if (raf) { cancelAnimationFrame(raf); raf = 0; }
     audio.pause();
-    var fresh = doc.createElement('audio');
-    fresh.preload = 'none';
-    fresh.crossOrigin = 'anonymous';
+    /* Именно makeAudio(), а не createElement: на новом элементе должны быть
+       те же слушатели playing/pause/error, иначе playing не придёт никогда,
+       интерфейс навсегда останется в STANDBY и станции перестанут
+       переключаться. */
+    var fresh = makeAudio();
     fresh.volume = vol;
+    fresh.src = streamOf(STATIONS[current < 0 ? 0 : current].id);
     if (audio) audio.parentNode && audio.parentNode.replaceChild(fresh, audio);
     audio = fresh;
-    analyser = null; srcNode = null; freq = null; contextInited = false; routed = false;
+    analyser = null; srcNode = null; freq = null; routed = false;
+    /* Старый контекст больше не нужен — закрываем, иначе на каждой
+       переподключённой станции копился бы свой. */
+    if (ctx) { try { ctx.close(); } catch (e) {} }
+    ctx = null; contextInited = false;
     if (was) { audio.currentTime = at; audio.play().catch(function () {}); }
   }
 
@@ -117,15 +136,29 @@
     a.preload = 'none';
     a.volume = vol;
     a.addEventListener('playing', function () {
-      playing = true; root.classList.add('onair'); paint();
+      playing = true; liveSince = performance.now(); silentFor = 0;
+      root.classList.add('onair'); paint();
     });
     a.addEventListener('pause', function () { playing = false; root.classList.remove('onair'); paint(); });
     a.addEventListener('waiting', function () { el.audio && el.audio.classList.add('is-buf'); });
     a.addEventListener('canplay', function () { el.audio && el.audio.classList.remove('is-buf'); });
     a.addEventListener('error', function () {
       playing = false; root.classList.remove('onair');
+      checked = true; liveSince = 0;
+      /* SomaFM раздаёт поток с нескольких зеркал. Если конкретное
+         недоступно из чьей-то сети — молча уходим на следующее, вместо
+         того чтобы писать пользователю «поток недоступен». */
+      if (tried < HOSTS.length - 1) {
+        tried++; hostIx = (hostIx + 1) % HOSTS.length;
+        if (el.state) { el.state.textContent = 'RETRY'; el.state.style.color = 'var(--a3)'; }
+        if (el.hint) el.hint.textContent = 'зеркало ' + HOSTS[hostIx] + ' · переключаюсь…';
+        a.src = streamOf(STATIONS[current < 0 ? 0 : current].id);
+        a.load();
+        a.play().catch(function () {});
+        return;
+      }
       if (el.state) { el.state.textContent = 'NO SIGNAL'; el.state.style.color = 'var(--a2)'; }
-      if (el.hint) el.hint.textContent = 'поток недоступен · попробуй другую станцию';
+      if (el.hint) el.hint.textContent = 'все зеркала молчат · жми play ещё раз';
       paint();
     });
     return a;
@@ -136,8 +169,14 @@
     if (!audio) { audio = makeAudio(); el.host && el.host.appendChild(audio); }
     current = i;
     var s = STATIONS[i];
+    hostIx = 0; tried = 0;
     audio.src = streamOf(s.id);
     audio.load();
+    /* новый поток — новый вердикт по спектрограмме */
+    checked = false; silentFor = 0; liveSince = 0; analyserOk = false;
+    /* пока новая станция не заиграла, снимаем onair — иначе рядом с
+       надписью STANDBY горит индикатор «в эфире». */
+    playing = false; root.classList.remove('onair');
     track = null;
     paintStations();
     if (el.station) el.station.textContent = s.name;
@@ -158,6 +197,10 @@
     if (!audio) return;
     if (ctx) ctxResume();
     if (!routed) route();
+    /* после error элемент не переиграет сам: тот же src, та же ошибка.
+       Перезагружаем — и play становится честной кнопкой «попробовать ещё». */
+    if (audio.error) { audio.load(); }
+    checked = false; silentFor = 0; liveSince = 0;
     var p = audio.play();
     if (p && p.catch) p.catch(function () {
       if (el.hint) el.hint.textContent = 'браузер заблокировал автозапуск · жми ещё раз';
@@ -169,7 +212,11 @@
     SPIRTOQ.audio && SPIRTOQ.audio.sfx && SPIRTOQ.audio.sfx.click();
   }
 
-  function toggle() { (playing ? pause : play)(); }
+  function toggle() {
+    if (playing) { pause(); return; }
+    if (audio && audio.error) { hostIx = 0; tried = 0; }   /* пробуем сначала */
+    play();
+  }
 
   function setVolume(v) {
     vol = Math.max(0, Math.min(1, v));
@@ -256,9 +303,13 @@
       for (var k = 0; k < freq.length; k++) if (freq[k] > peak) peak = freq[k];
       silent = peak < 3;
     }
-    if (playing && !checked) {
+    if (playing && !liveSince) liveSince = performance.now();
+    /* Первые ~2.5с после старта поток ещё не отдаёт звук: буфер пуст, и
+       анализатор честно показывает нули. Считать это поломкой нельзя. */
+    var grace = performance.now() - liveSince < 2500;
+    if (playing && !checked && !grace) {
       silentFor = silent ? silentFor + 1 : 0;
-      if (silentFor > 40) {           /* ~0.7s of nothing */
+      if (silentFor > 120) {          /* ~2s тишины, а не 0.7s */
         checked = true; analyserOk = false;
         if (el.hint) el.hint.textContent = 'спектрограмма недоступна · звук идёт напрямую';
         unroute();
